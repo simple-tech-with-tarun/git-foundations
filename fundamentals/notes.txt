@@ -3,4 +3,4 @@ Git Fundamentals - Practice Notes
 1. Git tracks changes to files.
 2. The staging area selects changes for the next commit.
 3. Commits record snapshots in repository history.
-
+4. Git compares the working tree, staging area, and committed snapshot.
