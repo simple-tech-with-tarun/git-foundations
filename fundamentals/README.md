@@ -152,7 +152,50 @@ These remote operations are covered in more detail in the collaboration section.
 
 ---
 
-## 4. Inspecting Repository State
+## 4. Staging Changes
+
+The staging area allows you to select which changes will be included in the next commit.
+
+### Stage a specific file
+
+Use `git add <file>` to stage changes to a particular file.
+
+```powershell
+git add fundamentals/notes.txt
+```
+
+This stages changes to `notes.txt` without automatically staging changes to other files.
+
+### Stage changes from the current directory
+
+Use `git add .` to stage changes under the current directory, including changes in nested directories.
+
+```powershell
+git add .
+```
+
+When run from the repository root, this stages applicable changes throughout the working tree, including new files, modifications, and deletions.
+
+### Verify what is staged
+
+After staging changes, inspect the repository status:
+
+```powershell
+git status
+git status --short
+```
+
+To inspect the actual content of staged changes, use:
+
+```powershell
+git diff --staged
+```
+
+**Key takeaway:** `git add` updates the staging area. It does not create a commit; the staged changes become part of repository history only when you commit them.
+
+---
+
+## 5. Inspecting Repository State
 
 Before staging or committing changes, inspect the repository to understand its current state.
 
@@ -209,7 +252,7 @@ This makes `HEAD` a useful reference when inspecting the current state of the re
 
 ---
 
-## 5. Understanding Git Differences
+## 6. Understanding Git Differences
 
 Git provides several commands for comparing file contents and committed snapshots. Understanding what each command compares is essential for reviewing changes before committing them.
 
@@ -294,7 +337,7 @@ The output is a representation of the difference between the compared states, no
 
 ---
 
-## 6. Inspecting Commits
+## 7. Inspecting Commits
 
 Use `git show` to inspect a specific commit.
 
@@ -344,7 +387,7 @@ For the full patch, use `git show` without `--stat`.
 
 ---
 
-## 7. Reviewing Changes Before a Commit
+## 8. Reviewing Changes Before a Commit
 
 A reliable workflow is to inspect the repository at each stage rather than commit changes without reviewing them.
 
