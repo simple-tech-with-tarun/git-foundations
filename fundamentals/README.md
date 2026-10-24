@@ -207,12 +207,11 @@ Displays the current branch and summarizes changes in the working tree and stagi
 git status
 ```
 
-Git commonly classifies changes as:
+Git commonly reports the following states for changes:
 
 - **Untracked:** A file exists in the working tree but is not tracked by Git.
 - **Modified, unstaged:** A tracked file has changes that are not staged.
 - **Staged:** Changes are selected for inclusion in the next commit.
-- **Committed:** Changes have been recorded in repository history.
 
 A clean working tree means there are no pending changes for Git to report.
 
@@ -294,7 +293,7 @@ Displays differences between the working tree and the current commit, including 
 git diff HEAD
 ```
 
-When there are no unstaged changes, the output will match `git diff --staged`, because the working tree and staging area contain the same content.
+When the working tree matches the staging area, `git diff HEAD` and `git diff --staged` show the same content differences relative to `HEAD`.
 
 ### Comparing two commits
 
@@ -417,6 +416,89 @@ Reviewing staged changes before committing helps prevent unintended edits from e
 
 ---
 
+## 9. Undoing and Removing Changes
+
+Git provides commands to discard unstaged changes, unstage changes, remove tracked files, and stop tracking files without deleting their local copies. These operations affect the working tree and staging area differently, so it is important to understand their effects before running them.
+
+### `git restore <file>` — discard unstaged changes
+
+Restores a file in the working tree from the staging area (index) by default.
+
+```powershell
+git restore fundamentals/restore-practice.txt
+```
+
+If a tracked file has been modified but the changes have not been staged, this command discards those modifications and restores the file to the version in the index.
+
+**Important:** This can permanently discard uncommitted changes to the specified file. Inspect the changes with `git diff` before restoring.
+
+### `git restore --staged <file>` — unstage changes
+
+Removes the specified file's staged changes from the index while preserving its working-tree content.
+
+```powershell
+git restore --staged fundamentals/restore-practice.txt
+```
+
+After running this command, the index is restored to the version in `HEAD`, while the file's working-tree content remains unchanged.
+
+If the file contains modifications, `git status` will show those changes as unstaged, and `git diff` will display them. `git diff --staged` will no longer display those changes.
+
+### `git rm <file>` — remove a tracked file
+
+Removes a tracked file from the working tree and stages its deletion.
+
+```powershell
+git rm fundamentals/restore-practice.txt
+```
+
+The file is removed from the working directory, and the deletion is recorded in the staging area. The deletion becomes part of repository history only when committed.
+
+If the deletion has been staged but not committed, it can be undone by first restoring the index and then restoring the working-tree file:
+
+```powershell
+git restore --staged fundamentals/restore-practice.txt
+git restore fundamentals/restore-practice.txt
+```
+
+The first command unstages the deletion. The second restores the file from the index.
+
+### `git rm --cached <file>` — stop tracking a file
+
+Removes a file from Git's index without deleting the local copy.
+
+```powershell
+git rm --cached fundamentals/restore-practice.txt
+```
+
+Git stages the file's removal from the repository, but the file remains in the working directory. `git status` shows a staged deletion and an untracked file with the same path.
+
+The change becomes part of repository history only if committed. Until then, the previous commit still contains the file.
+
+### Verify the effects of these commands
+
+Use the following commands to inspect repository state and compare changes:
+
+```powershell
+git status
+git status --short
+git diff
+git diff --staged
+git ls-files
+git ls-files --others --exclude-standard
+```
+
+- `git status` summarizes staged and unstaged changes.
+- `git status --short` provides a compact status view.
+- `git diff` displays unstaged changes to tracked files.
+- `git diff --staged` displays staged changes relative to `HEAD`.
+- `git ls-files` lists paths in Git's index.
+- `git ls-files --others --exclude-standard` lists untracked files that are not excluded by standard ignore rules.
+
+**Key distinction:** `git restore` changes file content or staging state, depending on its options. `git rm` stages a file's removal from tracking, with `--cached` preserving the local copy. None of these commands creates a commit.
+
+---
+
 ## Key Takeaways
 
 - Git records project history through commits.
@@ -428,5 +510,10 @@ Reviewing staged changes before committing helps prevent unintended edits from e
 - `git show` inspects an individual commit, while `git show --stat` summarizes its changes.
 - `HEAD` identifies the currently checked-out commit.
 - Reviewing changes before committing is an important habit in collaborative development.
+- `git restore <file>` discards unstaged changes by restoring content from the index.
+- `git restore --staged <file>` unstages changes while preserving working-tree content.
+- `git rm <file>` removes a tracked file and stages its deletion.
+- `git rm --cached <file>` stages removal from Git's index while keeping the local file.
+- `git status`, `git diff`, and `git diff --staged` help verify the effects of changes before committing.
 
 These fundamentals provide the basis for understanding branching, merging, remote synchronization, and safe history management.
