@@ -1,0 +1,4 @@
+Git branch practice
+
+This file is used to explore branch switching.
+Current baseline: main session starting point.
