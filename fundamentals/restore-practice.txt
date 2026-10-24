@@ -1,0 +1,4 @@
+Git restore practice
+
+This is the original content.
+Second line for modification exercises.
