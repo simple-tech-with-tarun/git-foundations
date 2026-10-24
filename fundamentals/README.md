@@ -499,6 +499,126 @@ git ls-files --others --exclude-standard
 
 ---
 
+## 10. Branching and Switching
+
+Branches allow you to develop features, fix bugs, and experiment without making changes directly on another branch. A branch is a reference to a commit, not a separate copy of the repository.
+
+### Understanding branches and `HEAD`
+
+A branch name points to a commit. When a new commit is created on that branch, the branch reference advances to the new commit.
+
+`HEAD` identifies the currently checked-out commit. In a typical branch-based workflow, `HEAD` points symbolically to the current branch.
+
+For example, when `feature/logging` is checked out:
+
+```text
+HEAD -> feature/logging -> commit
+```
+
+Inspect the current branch:
+
+```powershell
+git branch --show-current
+```
+
+List local branches:
+
+```powershell
+git branch
+```
+
+The asterisk (`*`) identifies the current branch.
+
+Display branch names, their latest commit hashes, and commit subjects:
+
+```powershell
+git branch -v
+```
+
+Include upstream tracking information, when configured:
+
+```powershell
+git branch -vv
+```
+
+Inspect the symbolic reference followed by `HEAD`:
+
+```powershell
+git symbolic-ref HEAD
+```
+
+On a branch named `feature/logging`, this typically prints:
+
+```text
+refs/heads/feature/logging
+```
+
+Inspect the latest commit reachable from `HEAD`:
+
+```powershell
+git log -1 --oneline HEAD
+```
+
+These commands help identify the current branch, its latest commit, and the relationship between `HEAD` and branch references.
+
+### Switching branches
+
+Use `git switch <branch>` to switch to an existing branch:
+
+```powershell
+git switch main
+```
+
+To create a new branch and switch to it immediately, use `git switch -c <new-branch>`:
+
+```powershell
+git switch -c feature/logging
+```
+
+The new branch starts at the currently checked-out commit. Creating a branch does not itself create a new commit or copy the repository.
+
+### Switching with uncommitted changes
+
+Git checks whether switching branches can be performed without overwriting local work.
+
+- **Clean working tree:** Switching normally proceeds without conflicts.
+- **Modified tracked files:** Git may block a switch if the target branch would overwrite or remove local changes.
+- **Untracked files:** These generally remain in the working directory when switching, provided they do not conflict with files tracked by the target branch.
+
+For example, Git may refuse to switch if a modified tracked file would be replaced by a different version from the target branch.
+
+Before switching, inspect the repository state:
+
+```powershell
+git status
+```
+
+If necessary, commit the changes or temporarily save them with `git stash`. Do not discard changes unless you are certain they are no longer needed.
+
+### Deleting branches
+
+Use `git branch -d <branch>` to delete a branch safely:
+
+```powershell
+git branch -d feature/logging
+```
+
+Git checks whether the branch's work has been merged into the relevant reference. If the branch contains unmerged commits, Git normally refuses the deletion.
+
+Use `git branch -D <branch>` to force-delete a branch:
+
+```powershell
+git branch -D feature/logging
+```
+
+The uppercase `-D` bypasses the unmerged-work safeguard. It removes the branch reference, not necessarily the commit objects immediately. Commits that are no longer reachable from other references may eventually be garbage-collected.
+
+Prefer `-d` for normal cleanup. Use `-D` only when you have confirmed that the branch's unmerged work is no longer needed.
+
+**Key takeaway:** Branches are lightweight references to commits. `git switch` changes the checked-out branch, while `git branch -d` protects against accidentally deleting unmerged work.
+
+---
+
 ## Key Takeaways
 
 - Git records project history through commits.
@@ -515,5 +635,10 @@ git ls-files --others --exclude-standard
 - `git rm <file>` removes a tracked file and stages its deletion.
 - `git rm --cached <file>` stages removal from Git's index while keeping the local file.
 - `git status`, `git diff`, and `git diff --staged` help verify the effects of changes before committing.
+- Branches are references to commits, and `HEAD` identifies the currently checked-out commit.
+- `git branch`, `git branch -v`, and `git branch -vv` provide different levels of branch information.
+- `git switch <branch>` switches branches, while `git switch -c <new-branch>` creates and switches to a new branch.
+- Git may block branch switching when local changes would be overwritten; untracked files generally remain in the working directory unless a conflict prevents switching.
+- `git branch -d` safely deletes a branch when its work is merged, while `git branch -D` force-deletes the branch reference.
 
 These fundamentals provide the basis for understanding branching, merging, remote synchronization, and safe history management.
