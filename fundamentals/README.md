@@ -825,30 +825,199 @@ git diff main feature-branch
 
 ---
 
-### Understanding Local and Remote Repository State
+## 12. Working with Remote Repositories
 
-Your local repository and a remote repository can contain different commit histories. A commit pushed by another contributor may exist on the remote even when your local repository has not downloaded information about it yet.
+Remote repositories allow you to share commits between repositories and collaborate with other developers. Git supports this through remote configuration, fetching, pulling, and pushing.
 
-Git uses remote-tracking branches, such as `origin/main`, to record the state of remote branches based on the latest fetch. These references help you compare your local branch with the remote without immediately integrating remote changes.
+Understanding these operations requires distinguishing between a local branch, a remote-tracking branch, and the branch stored in the remote repository.
 
-- `git fetch origin` downloads updates and refreshes remote-tracking references.
-- `git diff main origin/main` compares the file contents represented by the two branches.
-- `git rev-list --left-right --count main...origin/main` counts commits unique to each side.
+### 12.1 Configuring Remotes
 
-Fetching updates your local knowledge of the remote repository, but it does not automatically merge those changes into your current branch.
+A **remote** is a named reference to another Git repository. Git commonly uses `origin` as the default name for the remote from which a repository was cloned.
 
----
+List configured remotes and their URLs:
 
-### Fetching and Pulling Remote Changes
+```powershell
+git remote -v
+```
 
-Fetching and pulling both contact a remote repository, but they differ in how remote changes are integrated.
+Add a remote to an existing repository:
 
-- `git fetch` updates remote-tracking references without integrating the changes into the current branch.
-- `git pull` fetches remote updates and integrates them into the current branch according to the configured pull behavior.
+```powershell
+git remote add origin <repository-url>
+```
 
-Fetching is useful when you want to inspect incoming changes before integrating them. Pulling is useful when you're ready to update your current branch from its configured upstream.
+The remote name `origin` is conventional, not mandatory. A repository can have multiple remotes, each with its own name and URL.
 
-Before integrating remote changes, check your working-tree state and understand which branch you're updating.
+Inspect the URLs configured for a specific remote:
+
+```powershell
+git remote get-url origin
+```
+
+### 12.2 Fetching Remote Changes
+
+Fetching downloads commits and other relevant information from a remote repository and updates the corresponding remote-tracking references.
+
+```powershell
+git fetch origin
+```
+
+Fetching does not automatically merge remote changes into the current local branch or modify the working-tree files.
+
+This makes fetching useful when you want to learn about incoming changes before deciding whether to integrate them.
+
+### 12.3 Understanding Remote-Tracking Branches
+
+A **remote-tracking branch** records the state of a remote branch as observed by your local repository during operations such as fetching.
+
+For example:
+
+- `main` is a local branch.
+- `origin/main` is a remote-tracking branch representing the observed state of the remote's `main` branch.
+- The actual remote branch is stored in the remote repository.
+
+These references can point to different commits. For example, another contributor may push a commit to GitHub while your local `main` remains unchanged. After fetching, `origin/main` can advance to reflect that commit, while your local `main` stays where it was.
+
+Inspect local branches and their upstream tracking information:
+
+```powershell
+git branch -vv
+```
+
+Check the current branch and working-tree state:
+
+```powershell
+git status -sb
+```
+
+Remember that remote-tracking branches reflect the latest remote state your local repository has observed; they are not necessarily a live view of the remote.
+
+### 12.4 Inspecting Incoming Changes
+
+After fetching, you can compare your current branch with its upstream before integrating changes.
+
+Display commits reachable from the upstream but not from `HEAD`:
+
+```powershell
+git log HEAD..@{upstream} --oneline
+```
+
+Compare the file contents represented by the current commit and its upstream:
+
+```powershell
+git diff HEAD..@{upstream}
+```
+
+Count commits unique to each side of the comparison:
+
+```powershell
+git rev-list --left-right --count 'HEAD...@{upstream}'
+```
+
+The two numbers represent:
+
+1. Commits reachable only from `HEAD`.
+2. Commits reachable only from the upstream.
+
+For example, `2 3` means the current branch has two commits not in the upstream, while the upstream has three commits not in the current branch.
+
+These commands answer different questions: `git log` inspects commits, `git diff` compares file content, and `git rev-list` counts commits unique to each side.
+
+The `@{upstream}` reference requires an upstream to be configured for the current branch. In PowerShell, quote the expression to prevent the shell from interpreting its special characters:
+
+```powershell
+git log 'HEAD..@{upstream}' --oneline
+git diff 'HEAD..@{upstream}'
+git rev-list --left-right --count 'HEAD...@{upstream}'
+```
+
+### 12.5 Pulling Remote Changes
+
+`git pull` fetches remote changes and integrates them into the current branch according to the configured pull behavior.
+
+```powershell
+git pull
+```
+
+When an upstream is configured, Git uses it to determine which remote branch to pull from.
+
+Unlike `git fetch`, pulling proceeds to integration rather than stopping after updating remote-tracking references. Depending on the branch history and configuration, integration may use a fast-forward, a merge, or a rebase.
+
+Before pulling, inspect the working-tree state and review incoming changes when appropriate. This helps you understand what will be integrated and reduces the risk of unexpected conflicts.
+
+### 12.6 Pushing Local Commits
+
+Pushing publishes eligible local commits to a remote repository.
+
+```powershell
+git push
+```
+
+When the current branch has an upstream configured, Git can use that relationship to determine the default destination.
+
+To push a new local branch and set its upstream at the same time:
+
+```powershell
+git push -u origin <branch-name>
+```
+
+The `-u` option, also called `--set-upstream`, configures the upstream relationship after a successful push. This allows subsequent `git push` and `git pull` commands to use the configured relationship by default.
+
+Pushing does not automatically update other developers' local branches. They must fetch or pull the remote changes into their own repositories.
+
+### 12.7 Understanding Upstream Tracking
+
+An **upstream branch** is the remote-tracking branch associated with a local branch. This relationship helps Git determine the default remote branch for synchronization operations.
+
+For example, a local `main` branch commonly tracks `origin/main`. A feature branch may track `origin/feature/example`.
+
+Inspect the upstream of the current branch:
+
+```powershell
+git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}'
+```
+
+If no upstream is configured, Git reports an error. You can establish the relationship when publishing a new branch:
+
+```powershell
+git push -u origin <branch-name>
+```
+
+Use `git branch -vv` to inspect upstream information across local branches.
+
+A local branch can exist without an upstream. Creating a branch locally does not automatically create its remote counterpart or configure tracking.
+
+### 12.8 A Practical Remote Synchronization Workflow
+
+A safe synchronization workflow separates inspection, integration, and publication.
+
+```powershell
+git status -sb
+git fetch origin
+git branch -vv
+git log 'HEAD..@{upstream}' --oneline
+git diff 'HEAD..@{upstream}'
+git pull
+git status -sb
+git push
+```
+
+This sequence assumes that the current branch has an upstream configured and that the intended operation is to integrate its upstream changes before pushing local work.
+
+The workflow demonstrates the following:
+
+1. Inspect the current branch and working-tree state.
+2. Fetch remote updates without immediately integrating them.
+3. Check branch tracking information.
+4. Review incoming commits and file differences.
+5. Pull changes when ready to integrate them.
+6. Verify the repository state after integration.
+7. Push local commits when they are ready to publish.
+
+If the branch has no upstream, establish the appropriate tracking relationship first. If the local and remote histories have diverged, inspect both sides before choosing how to integrate them.
+
+**Key distinction:** `git fetch` updates your knowledge of the remote, `git pull` fetches and integrates changes, and `git push` publishes local commits. Upstream tracking connects these operations to the intended remote branch.
 
 ---
 
@@ -876,5 +1045,12 @@ Before integrating remote changes, check your working-tree state and understand 
 - **Merging branches:** A fast-forward merge advances the target branch pointer without creating a merge commit. When branches have diverged, Git may create a merge commit to connect their histories.
 - **Resolving conflicts:** Git marks conflicting content with conflict markers when it cannot automatically reconcile changes. Resolve the file, stage the result, and commit to complete the merge.
 - **Inspecting history:** Use `git log --graph --oneline --decorate` to visualize branch divergence and merge relationships. Use `git diff` to compare file snapshots between references.
+- A remote is a named reference to another Git repository, commonly identified by a name such as `origin`.
+- `git fetch` updates remote-tracking references without automatically integrating changes into the current branch.
+- `git pull` fetches and integrates remote changes, while `git push` publishes eligible local commits.
+- Remote-tracking branches such as `origin/main` represent the remote state observed during the latest fetch.
+- `git log`, `git diff`, and `git rev-list` help inspect incoming changes, compare snapshots, and count commits unique to each side.
+- Upstream tracking identifies the remote-tracking branch used by default for operations such as `git pull` and `git push`.
+- `git push -u origin <branch-name>` publishes a branch and configures its upstream after a successful push.
 
 These fundamentals provide the basis for understanding branching, merging, remote synchronization, and safe history management.
