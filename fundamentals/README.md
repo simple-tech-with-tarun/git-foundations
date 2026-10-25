@@ -619,6 +619,212 @@ Prefer `-d` for normal cleanup. Use `-D` only when you have confirmed that the b
 
 ---
 
+## 11. Merging and Merge Conflicts
+
+Merging integrates changes from one branch into another. It allows work developed on separate branches to become part of a shared branch while preserving the project's commit history.
+
+### 11.1 Understanding Git Merges
+
+When you merge a branch, Git attempts to integrate its changes into the currently checked-out branch.
+
+The current branch is the **target branch**, and the branch being integrated is the **source branch**.
+
+```powershell
+git switch main
+git merge feature-branch
+```
+
+This switches to `main` and merges `feature-branch` into it.
+
+**Important:** The merge affects the branch you currently have checked out. Git does not automatically switch to the source branch.
+
+### 11.2 Fast-Forward Merges
+
+A fast-forward merge is possible when the target branch has not diverged from the source branch's history.
+
+Instead of creating a new commit, Git advances the target branch pointer to the source branch's latest commit.
+
+```powershell
+git switch main
+git merge feature-branch
+```
+
+A successful fast-forward merge produces output similar to:
+
+```text
+Updating abc1234..def5678
+Fast-forward
+```
+
+Characteristics of a fast-forward merge:
+
+- No new merge commit is created.
+- The target branch pointer advances to an existing commit.
+- The existing commit history remains unchanged.
+
+Fast-forward merges are possible when the target branch can advance directly to the source branch's tip without combining divergent histories.
+
+### 11.3 Three-Way Merges and Merge Commits
+
+When both branches have new commits since they diverged, Git cannot simply advance the target branch pointer.
+
+Git uses a three-way merge, considering:
+
+- The common ancestor of the two branches.
+- The current state of the target branch.
+- The current state of the source branch.
+
+When the changes can be integrated, Git typically creates a **merge commit** that connects the two histories.
+
+```powershell
+git switch main
+git merge feature-branch
+```
+
+A merge commit has two parents in a standard two-branch merge. It records the integration of the two lines of development.
+
+A merge commit may also be created when a fast-forward would otherwise be possible by using:
+
+```powershell
+git merge --no-ff feature-branch
+```
+
+This forces Git to create a merge commit rather than fast-forwarding.
+
+### 11.4 Understanding Merge Conflicts
+
+A merge conflict occurs when Git cannot automatically reconcile changes from different branches.
+
+One common example is when two branches modify the same line of a file differently.
+
+Suppose the target branch contains:
+
+```text
+Topic: merging strategies
+```
+
+The source branch contains:
+
+```text
+Topic: resolving merge conflicts
+```
+
+Git cannot determine which version should be kept, so it marks the file as conflicted and pauses the merge.
+
+Conflicts do not necessarily mean the changes are incorrect. They mean that a human decision is needed to determine the intended result.
+
+### 11.5 Reading Conflict Markers
+
+During a content conflict, Git places markers in the affected file:
+
+```text
+<<<<<<< HEAD
+Topic: merging strategies
+=======
+Topic: resolving merge conflicts
+>>>>>>> feature-branch
+```
+
+The markers identify the competing versions:
+
+- `<<<<<<< HEAD` begins the version from the current branch.
+- `=======` separates the two versions.
+- `>>>>>>> feature-branch` ends the incoming branch's version.
+
+The incoming branch name appears after the final marker. The exact labels depend on the branches involved.
+
+These markers are temporary conflict-resolution instructions, not content that should normally remain in the final file.
+
+### 11.6 Resolving a Merge Conflict
+
+Resolve a conflict by editing the affected file and choosing the intended final content. You may keep either version, combine them, or rewrite the content appropriately.
+
+For example, the resolved file could contain:
+
+```text
+Topic: merging strategies and resolving merge conflicts
+```
+
+After editing the file, inspect the repository state:
+
+```powershell
+git status
+```
+
+Stage the resolved file:
+
+```powershell
+git add <resolved-file>
+```
+
+Staging a resolved file tells Git that the conflict has been addressed.
+
+Check the status again:
+
+```powershell
+git status
+```
+
+Once all conflicts are resolved and staged, Git reports that all conflicts are fixed but the merge is still in progress. Complete the merge by creating the merge commit:
+
+```powershell
+git commit -m "Resolve merge conflict"
+```
+
+After the commit, verify the repository state:
+
+```powershell
+git status
+```
+
+A successful merge should leave the working tree clean if there are no other changes.
+
+**Important:** Resolving and staging conflicts does not finish the merge. The merge must be committed unless it is aborted.
+
+### 11.7 Inspecting Merge History
+
+Git provides commands to inspect commits and understand how branches were integrated.
+
+Display a compact commit history:
+
+```powershell
+git log --oneline
+```
+
+Display the history as a graph, including branch and tag references:
+
+```powershell
+git log --graph --oneline --decorate
+```
+
+Limit the graph to recent commits:
+
+```powershell
+git log --graph --oneline --decorate -10
+```
+
+The graph helps distinguish between:
+
+- A fast-forward merge, which advances a branch pointer without creating a merge commit.
+- A merge commit, which connects two previously divergent lines of development.
+- Commits unique to each branch before the merge.
+
+To inspect the changes recorded by a commit, including a merge commit:
+
+```powershell
+git show --stat HEAD
+```
+
+To compare the file contents represented by two branches:
+
+```powershell
+git diff main feature-branch
+```
+
+`git diff` compares the snapshots represented by the specified references. It does not, by itself, establish whether one branch has been merged into another.
+
+---
+
 ## Key Takeaways
 
 - Git records project history through commits.
@@ -640,5 +846,8 @@ Prefer `-d` for normal cleanup. Use `-D` only when you have confirmed that the b
 - `git switch <branch>` switches branches, while `git switch -c <new-branch>` creates and switches to a new branch.
 - Git may block branch switching when local changes would be overwritten; untracked files generally remain in the working directory unless a conflict prevents switching.
 - `git branch -d` safely deletes a branch when its work is merged, while `git branch -D` force-deletes the branch reference.
+- **Merging branches:** A fast-forward merge advances the target branch pointer without creating a merge commit. When branches have diverged, Git may create a merge commit to connect their histories.
+- **Resolving conflicts:** Git marks conflicting content with conflict markers when it cannot automatically reconcile changes. Resolve the file, stage the result, and commit to complete the merge.
+- **Inspecting history:** Use `git log --graph --oneline --decorate` to visualize branch divergence and merge relationships. Use `git diff` to compare file snapshots between references.
 
 These fundamentals provide the basis for understanding branching, merging, remote synchronization, and safe history management.
