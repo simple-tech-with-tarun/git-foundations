@@ -839,6 +839,19 @@ Fetching updates your local knowledge of the remote repository, but it does not 
 
 ---
 
+### Fetching and Pulling Remote Changes
+
+Fetching and pulling both contact a remote repository, but they differ in how remote changes are integrated.
+
+- `git fetch` updates remote-tracking references without integrating the changes into the current branch.
+- `git pull` fetches remote updates and integrates them into the current branch according to the configured pull behavior.
+
+Fetching is useful when you want to inspect incoming changes before integrating them. Pulling is useful when you're ready to update your current branch from its configured upstream.
+
+Before integrating remote changes, check your working-tree state and understand which branch you're updating.
+
+---
+
 ## Key Takeaways
 
 - Git records project history through commits.
