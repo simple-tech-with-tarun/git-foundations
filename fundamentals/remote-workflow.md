@@ -32,3 +32,12 @@ Check the configured upstream with:
 ```bash
 git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}'
 ```
+
+## Inspecting Incoming Changes
+
+Fetch remote updates before integrating them when you want to review incoming commits.
+
+```bash
+git fetch origin
+git log HEAD..@{upstream} --oneline
+git diff HEAD..@{upstream}
