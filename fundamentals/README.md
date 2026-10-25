@@ -825,6 +825,20 @@ git diff main feature-branch
 
 ---
 
+### Understanding Local and Remote Repository State
+
+Your local repository and a remote repository can contain different commit histories. A commit pushed by another contributor may exist on the remote even when your local repository has not downloaded information about it yet.
+
+Git uses remote-tracking branches, such as `origin/main`, to record the state of remote branches based on the latest fetch. These references help you compare your local branch with the remote without immediately integrating remote changes.
+
+- `git fetch origin` downloads updates and refreshes remote-tracking references.
+- `git diff main origin/main` compares the file contents represented by the two branches.
+- `git rev-list --left-right --count main...origin/main` counts commits unique to each side.
+
+Fetching updates your local knowledge of the remote repository, but it does not automatically merge those changes into your current branch.
+
+---
+
 ## Key Takeaways
 
 - Git records project history through commits.
