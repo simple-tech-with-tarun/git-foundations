@@ -1,1 +1,1 @@
-Merge commit practice
+Topic: resolving merge conflicts
