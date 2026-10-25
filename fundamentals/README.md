@@ -718,11 +718,11 @@ Conflicts do not necessarily mean the changes are incorrect. They mean that a hu
 During a content conflict, Git places markers in the affected file:
 
 ```text
-<<<<<<< HEAD
+[Current branch version]
 Topic: merging strategies
-=======
+[Separator]
 Topic: resolving merge conflicts
->>>>>>> feature-branch
+[Incoming branch version]
 ```
 
 The markers identify the competing versions:
