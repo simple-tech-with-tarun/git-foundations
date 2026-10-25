@@ -1,1 +1,1 @@
-Topic: Git merging
+Topic: resolving merge conflicts
