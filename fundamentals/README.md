@@ -1021,6 +1021,178 @@ If the branch has no upstream, establish the appropriate tracking relationship f
 
 ---
 
+## 13. Working with Git Tags
+
+Git tags are references used to mark specific commits in a repository's history. They are commonly used to identify releases, milestones, and other important points in a project's development.
+
+Unlike branches, tags do not automatically move forward when new commits are created. A tag can point to a commit that is reachable from `main`, a feature branch, or another branch's history.
+
+### 13.1 Listing Tags
+
+List all tags in the local repository:
+
+```powershell
+git tag
+```
+
+Use `--list` to explicitly list tags:
+
+```powershell
+git tag --list
+```
+
+If no tags exist, these commands return no output.
+
+### 13.2 Lightweight and Annotated Tags
+
+Git supports two common types of tags.
+
+**Lightweight tags** are simple references to a commit. They do not create a separate tag object containing tagger information or a message.
+
+Create a lightweight tag:
+
+```powershell
+git tag v1.0
+```
+
+**Annotated tags** create a separate Git tag object containing the tagger, creation date, message, and reference to the target object. They are generally preferred for releases and other significant milestones.
+
+Create an annotated tag:
+
+```powershell
+git tag -a v1.0 -m "Version 1.0"
+```
+
+Both types can point to the current commit or a specific earlier commit.
+
+### 13.3 Tagging a Specific Commit
+
+To tag a specific commit, provide its commit hash or another valid commit reference.
+
+Create a lightweight tag for a specific commit:
+
+```powershell
+git tag v1.0 <commit-hash>
+```
+
+Create an annotated tag for a specific commit:
+
+```powershell
+git tag -a v1.0 <commit-hash> -m "Version 1.0"
+```
+
+Creating a tag for an earlier commit does not require checking out that commit.
+
+### 13.4 Inspecting Tags
+
+Use `git show` to inspect a tag and its target commit:
+
+```powershell
+git show v1.0
+```
+
+For annotated tags, the output includes the tag metadata and the target commit's information. Depending on the target commit, it may also show a diff.
+
+To display the tag and commit information without the patch:
+
+```powershell
+git show v1.0 --no-patch
+```
+
+Inspect the underlying Git object type:
+
+```powershell
+git cat-file -t v1.0
+```
+
+A lightweight tag normally resolves directly to a `commit` object, while an annotated tag resolves to a `tag` object.
+
+To resolve either tag to its target commit hash:
+
+```powershell
+git rev-parse 'v1.0^{commit}'
+```
+
+The `^{commit}` suffix peels the tag and resolves it to the commit it ultimately references. In PowerShell, quote the complete expression so the shell does not misinterpret the special characters.
+
+### 13.5 Inspecting Merge Commits
+
+A merge commit has multiple parents. By default, `git show` generally does not display a patch for a merge commit.
+
+Use `-m` to display separate diffs against its parents:
+
+```powershell
+git show -m v1.0
+```
+
+This helps inspect the changes introduced by a merge relative to each parent. The option changes how Git displays the commit; it does not modify the commit or tag.
+
+### 13.6 Pushing Tags to a Remote
+
+Pushing a branch does not automatically push every local tag.
+
+Push one specific tag:
+
+```powershell
+git push origin v1.0
+```
+
+List tags advertised by the remote:
+
+```powershell
+git ls-remote --tags origin
+```
+
+To push all local tags that are not already present on the remote:
+
+```powershell
+git push origin --tags
+```
+
+Use `--tags` carefully because it publishes all local tags, including tags that may have been created for testing.
+
+### 13.7 Deleting Tags
+
+Delete a local tag:
+
+```powershell
+git tag -d v1.0
+```
+
+Delete a tag from a remote repository:
+
+```powershell
+git push origin --delete v1.0
+```
+
+These operations delete tag references, not the commits themselves. Removing a remote tag does not automatically delete the corresponding local tag, and deleting a local tag does not automatically remove the remote tag.
+
+### 13.8 Renaming Tags
+
+Git does not provide a dedicated tag-renaming command. To rename a tag, create a new tag with the desired name pointing to the same target, then delete the old tag.
+
+For example:
+
+```powershell
+git tag new-name old-name
+git tag -d old-name
+```
+
+If the old tag has already been pushed, update the remote separately by pushing the new tag and deleting the old remote tag.
+
+### 13.9 Tags Versus Branches
+
+Tags and branches can both reference commits, but they serve different purposes.
+
+- **Branches** are movable references that normally advance when new commits are created on them.
+- **Tags** mark specific points in history and do not automatically advance when new commits are created.
+- A tag can reference a commit reachable from any branch; it is not restricted to `main`.
+- Tags are useful for releases and milestones, while branches are used to continue and organize development work.
+
+Annotated tags are a good choice for meaningful releases and milestones because they include metadata and a descriptive message.
+
+---
+
 ## Key Takeaways
 
 - Git records project history through commits.
@@ -1052,5 +1224,12 @@ If the branch has no upstream, establish the appropriate tracking relationship f
 - `git log`, `git diff`, and `git rev-list` help inspect incoming changes, compare snapshots, and count commits unique to each side.
 - Upstream tracking identifies the remote-tracking branch used by default for operations such as `git pull` and `git push`.
 - `git push -u origin <branch-name>` publishes a branch and configures its upstream after a successful push.
+- Git tags mark specific commits and are commonly used for releases and development milestones.
+- Lightweight tags are simple commit references, while annotated tags include metadata and a message and are generally preferred for releases.
+- Tags can point to commits reachable from any branch; they are not restricted to `main`.
+- `git show`, `git cat-file -t`, and `git rev-parse 'tag-name^{commit}'` help inspect tags and resolve their target commits.
+- `git push origin <tag-name>` publishes a specific tag; pushing a branch does not automatically publish every local tag.
+- Local and remote tags are managed separately. Deleting a tag removes the reference, not the commit itself.
+- `git show -m <commit>` displays separate diffs for a merge commit against its parents, while `--no-patch` suppresses patch output.
 
 These fundamentals provide the basis for understanding branching, merging, remote synchronization, and safe history management.
