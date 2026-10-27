@@ -24,7 +24,7 @@ def filter_tasks(keyword):
 
 if __name__ == "__main__":
     display_tasks()
-    print(f"\nTotal tasks in tracker: {count_tasks()}")
+    print(f"\nTotal tasks: {count_tasks()}")
 
     print("\nTasks matching 'Git'(case-insensitive):")
     for task in filter_tasks("Git"):
