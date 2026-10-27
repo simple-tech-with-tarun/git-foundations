@@ -2,32 +2,55 @@
 
 <sub>🛡️ © 2026 Tarun Bansal · Simple Tech With Tarun. All rights reserved, except where otherwise stated. See the <a href="https://github.com/simple-tech-with-tarun/simple-tech-with-tarun/blob/main/COPYRIGHT.md">Copyright & Intellectual Property Notice</a>.</sub>
 
-A practical reference for understanding Git fundamentals, workflows, branching, collaboration, and version control concepts.
+A practical learning repository for understanding Git, mastering version control workflows, and developing the skills needed to work confidently with Git in software development and DevOps environments.
 
-This repository documents the core Git concepts and workflows that form the foundation of modern software development and DevOps practices.
+This repository combines hands-on exercises, technical explanations, and practical references to help learners understand not only which Git commands to use, but also how Git works and why different workflows matter.
 
-The focus is on understanding how Git works, why different commands and workflows are used, and how they fit together in real-world development environments.
+## 📚 Learning Areas
 
-## 📚 What You'll Find Here
+### 1. Git Fundamentals
 
-- Git fundamentals
-- Repository structure and Git objects
-- Working tree, staging area, and commits
-- Branches and branching strategies
-- Merging and rebasing
-- Remote repositories
-- Fetch, pull, and push workflows
-- Tags and releases
-- Stashing changes
-- Undoing and recovering changes
-- Merge conflicts
-- Git history and inspection
-- Collaboration workflows
-- Git best practices
+The fundamentals section covers the essential concepts and workflows required to work with Git effectively.
 
-## 🧠 Core Concepts
+Topics include:
 
-The repository covers the fundamental Git workflow:
+- Introduction to version control and Git
+- Understanding the Git workflow
+- Working with the staging area and commits
+- Inspecting repository state and differences
+- Reviewing changes before committing
+- Undoing and removing changes
+- Branching and switching between branches
+- Merging branches and handling merge conflicts
+- Working with remote repositories
+- Understanding and managing Git tags
+
+**Learning materials:** [`fundamentals/`](fundamentals/)
+
+The [Fundamentals Learning Guide](fundamentals/README.md) provides the detailed roadmap, organized into 13 sections, along with key takeaways and references.
+
+### 2. Advanced Git
+
+The advanced section will build on the fundamentals through focused topics, practical exercises, and dedicated documentation.
+
+Planned learning areas include:
+
+| Topic | Focus |
+|---|---|
+| [History Rewriting](history-rewriting/README.md) | Rebasing, interactive rebase, amending commits, and squashing changes |
+| [Advanced Branching](advanced-branching/README.md) | Cherry-picking, branch integration, and advanced conflict resolution |
+| [Recovery and Undo](recovery-and-undo/README.md) | Resetting and reverting commits, reflog, and recovering work |
+| [Work Management](work-management/README.md) | Stashing changes and managing interrupted work |
+| [Debugging and Investigation](debugging-and-investigation/README.md) | Bisecting history, inspecting contributions, and tracing bugs |
+| [Git Internals](git-internals/README.md) | Objects, references, HEAD, and the internal structure of a repository |
+
+Each advanced topic will have its own directory containing the relevant learning materials and references.
+
+*These advanced learning areas are planned; their documentation and exercises will be added as the repository develops.*
+
+## 🧠 Core Git Workflow
+
+The fundamental Git workflow moves changes from the working directory through the staging area and into commits. Those commits are stored in the local repository and can be shared with a remote repository.
 
 ```text
 Working Directory
@@ -44,6 +67,18 @@ Working Directory
        ▼
  Remote Repository
 ```
+
+This workflow provides the foundation for understanding how Git tracks changes, records project history, and supports collaboration.
+
+## 🛠️ How to Use This Repository
+
+1. Start with the [Git Fundamentals Learning Guide](fundamentals/README.md).
+2. Work through the topics in sequence, practicing the commands and examining their effects.
+3. Use the accompanying reference documentation when revisiting a concept or command.
+4. Progress to the advanced learning areas as their materials become available.
+
+The repository is intended to serve as both a structured learning path and a long-term technical reference.
+
 ---
 
 > **🛡️ Copyright & Intellectual Property**
