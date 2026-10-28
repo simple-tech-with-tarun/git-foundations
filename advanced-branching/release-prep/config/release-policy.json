@@ -1,5 +1,6 @@
 {
   "require_version_validation": true,
+  "require_approval": true,
   "allowed_channels": [
     "development",
     "staging",
