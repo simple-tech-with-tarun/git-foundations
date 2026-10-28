@@ -10,6 +10,13 @@ def load_release_metadata():
         return json.load(config_file)
 
 
+def load_release_policy():
+    policy_path = Path(__file__).parent / "config" / "release-policy.json"
+
+    with policy_path.open(encoding="utf-8") as policy_file:
+        return json.load(policy_file)
+
+
 def validate_version(version):
     return bool(re.fullmatch(r"\d+\.\d+\.\d+", version))
 
