@@ -23,9 +23,15 @@ def validate_version(version):
 
 def display_release_summary():
     release = load_release_metadata()
+    policy = load_release_policy()
 
-    if not validate_version(release["version"]):
+    if policy["require_version_validation"] and not validate_version(
+        release["version"]
+    ):
         raise ValueError(f"Invalid release version: {release['version']}")
+
+    if release["channel"] not in policy["allowed_channels"]:
+        raise ValueError(f"Invalid release channel: {release['channel']}")
 
     print("Release Summary")
     print("---------------")
