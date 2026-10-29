@@ -1,0 +1,4 @@
+{
+  "notify_on_approval": true,
+  "notification_channel": "email"
+}
