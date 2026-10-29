@@ -4,5 +4,6 @@
     "development",
     "staging",
     "production"
-  ]
+  ],
+  "approval_mode": "manual"
 }
