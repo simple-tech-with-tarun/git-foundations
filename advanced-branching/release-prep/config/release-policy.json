@@ -1,0 +1,8 @@
+{
+  "require_version_validation": true,
+  "allowed_channels": [
+    "development",
+    "staging",
+    "production"
+  ]
+}

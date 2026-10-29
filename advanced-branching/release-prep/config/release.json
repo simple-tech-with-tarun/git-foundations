@@ -1,0 +1,6 @@
+{
+ "name": "Release Preparation Tool",
+  "version": "0.1.0",
+  "channel": "development",
+  "target_branch": "main"
+}
