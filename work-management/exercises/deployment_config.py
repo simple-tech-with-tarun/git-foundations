@@ -20,3 +20,7 @@ def get_deployment_summary():
 
 def is_production_deployment():
     return deployment_config["environment"] == "production"
+
+
+def get_deployment_region():
+    return deployment_config["region"]
