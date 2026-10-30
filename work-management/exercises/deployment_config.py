@@ -5,5 +5,10 @@ deployment_config = {
     "replicas": 2,
 }
 
+
 def get_deployment_config():
     return deployment_config
+
+
+def get_deployment_summary():
+    return "Production deployment configuration"
