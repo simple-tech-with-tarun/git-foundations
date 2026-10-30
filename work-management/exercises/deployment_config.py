@@ -6,9 +6,17 @@ deployment_config = {
 }
 
 
+def get_application_name():
+    return deployment_config["application"]
+
+
 def get_deployment_config():
     return deployment_config
 
 
 def get_deployment_summary():
     return "Production deployment configuration"
+
+
+def is_production_deployment():
+    return deployment_config["environment"] == "production"
