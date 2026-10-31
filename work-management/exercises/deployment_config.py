@@ -15,7 +15,7 @@ def get_deployment_config():
 
 
 def get_deployment_summary():
-    return "Deployment summary for payment-service"
+    return "Production deployment summary for payment-service"
 
 
 def is_production_deployment():
@@ -27,7 +27,7 @@ def get_deployment_environment():
 
 
 def get_deployment_region():
-    return f"Deployment region: {deployment_config['region']}"
+    return f"Deployment region: {deployment_config['region']} (primary)"
 
 
 def get_deployment_notes_file():

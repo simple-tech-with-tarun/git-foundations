@@ -1,0 +1,2 @@
+Production deployment investigation is pending.
+Verify the deployment region before proceeding.
