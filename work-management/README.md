@@ -15,10 +15,11 @@ The objective is to understand not only how to execute stash commands, but also 
 - Include untracked and ignored files in stash entries.
 - Selectively stash individual changes and hunks.
 - Inspect the internal structure of stash commits.
-- Apply stash entries across different working states.
+- Apply stash entries across different working states and branches.
 - Resolve conflicts when applying stashed changes.
+- Understand branch-based stash recovery.
 - Manage stash entries using `drop` and `clear`.
-- Understand recovery considerations for removed stash entries.
+- Investigate and recover dropped stash entries using Git's object database.
 
 ## Repository Structure
 
@@ -227,6 +228,8 @@ Git prevented the operation because applying the second stash could overwrite lo
 
 The existing changes were temporarily stashed before proceeding.
 
+This was an overwrite-protection failure rather than a content conflict.
+
 ### Resolving a content conflict
 
 After applying another stash and committing the restored changes, the temporary stash was applied again.
@@ -297,7 +300,294 @@ This is important when working with multiple stash entries: always inspect the c
 
 The final `git stash clear` exercise removed all remaining stash entries.
 
-## 8. Observations and Further Investigation
+## 8. Cross-Branch Stash Workflows
+
+The second phase introduced branch-based stash operations using separate experiment branches.
+
+The experiment used the following branches:
+
+```text
+feature/work-management
+        |
+        ├── experiment/stash-source
+        |
+        ├── experiment/stash-destination
+        |
+        └── recovery/stash-owner
+```
+
+The experiment branches were created from the existing feature branch so that the stash operations could be tested independently of the main development workflow.
+
+### Creating a stash on the source branch
+
+On `experiment/stash-source`, a deployment owner helper was introduced in `deployment_config.py`:
+
+```python
+def get_deployment_owner():
+    return "platform-team"
+```
+
+The change was saved using:
+
+```powershell
+git stash push -m "WIP: deployment owner on source branch"
+```
+
+This created a stash containing the new function without requiring a commit on the source branch.
+
+### Applying the stash on another branch
+
+The destination branch was checked out:
+
+```powershell
+git switch experiment/stash-destination
+```
+
+The stash was applied:
+
+```powershell
+git stash apply 'stash@{0}'
+```
+
+Git successfully restored the source branch's changes on the destination branch.
+
+The original stash remained available because `apply` does not remove the stash entry.
+
+This demonstrated that a stash can be applied on a different branch when the destination working tree and the changes are compatible.
+
+### Handling a cross-branch content conflict
+
+The destination branch was then given its own implementation of `get_deployment_owner()`:
+
+```python
+def get_deployment_owner():
+    return "infrastructure-team"
+```
+
+The destination implementation was committed in:
+
+`58948f9 test: add destination deployment owner`
+
+The original stash was applied again:
+
+```powershell
+git stash apply 'stash@{0}'
+```
+
+This time Git reported a content conflict because both branches contained different implementations of the same function.
+
+The conflict was represented using Git's conflict markers:
+
+```python
+def get_deployment_owner():
+ <<<<<<< Updated upstream
+     return "infrastructure-team"
+ =======
+     return "platform-team"
+ >>>>>>> Stashed changes
+```
+
+The resolution retained the source implementation:
+
+```python
+def get_deployment_owner():
+    return "platform-team"
+```
+
+The resolved file was staged and committed:
+
+`dfd74fc test: resolve cross-branch stash conflict`
+
+This exercise demonstrated that stash application across branches follows the same conflict-resolution principles as other Git merge operations.
+
+### Important observations
+
+- A stash is not restricted to the branch on which it was created.
+- Applying a stash on another branch does not change the original stash entry.
+- A clean destination working tree does not guarantee conflict-free application.
+- Changes to the same function or lines can produce a content conflict.
+- A successfully resolved stash application can be committed like any other working-tree change.
+
+## 9. Branch-Based Stash Recovery with `git stash branch`
+
+The next experiment explored `git stash branch`, which creates a new branch using the original base commit of a stash and applies the stash there.
+
+The operation was performed using:
+
+```powershell
+git stash branch recovery/stash-owner 'stash@{0}'
+```
+
+Git created and switched to the new branch:
+
+`recovery/stash-owner`
+
+The stashed implementation was restored:
+
+```python
+def get_deployment_owner():
+    return "platform-team"
+```
+
+The stash entry was automatically dropped after successful application.
+
+### Understanding the behaviour
+
+`git stash branch` differs from applying a stash directly to another branch.
+
+| Operation | Behaviour |
+|---|---|
+| `git stash apply` | Applies changes to the current branch and retains the stash |
+| `git stash pop` | Applies changes and removes the stash after successful application |
+| `git stash branch` | Creates a branch at the stash's original base, applies the stash, and drops the stash after successful application |
+
+The important distinction is that `git stash branch` recreates the original working context rather than applying the changes on top of the current branch's latest commit.
+
+### Validation
+
+The recovered implementation was checked using Ruff:
+
+```powershell
+python -m ruff format .\work-management\exercises\
+python -m ruff check .\work-management\exercises\
+```
+
+Both checks passed.
+
+## 10. Recovering Dropped Stashes
+
+The final recovery exercise investigated whether a stash removed using `git stash drop` could be recovered from Git's object database.
+
+### Dropping a stash
+
+Before removing the stash, its commit hash was captured:
+
+```powershell
+git rev-parse 'stash@{0}'
+```
+
+The resulting hash was:
+
+```text
+782d5f921962cf29a905042db25d8b046ae3cb5e
+```
+
+The stash was then removed:
+
+```powershell
+git stash drop 'stash@{0}'
+```
+
+The stash list no longer contained the entry.
+
+### Investigating unreachable Git objects
+
+The following command was used:
+
+```powershell
+git fsck --no-reflogs --unreachable
+```
+
+This command checks Git's object database and reports objects that are unreachable from the references and reflogs considered by the operation.
+
+The output contained numerous unreachable objects, including the previously captured stash commit:
+
+```text
+unreachable commit 782d5f921962cf29a905042db25d8b046ae3cb5e
+```
+
+This confirmed that removing the stash reference did not immediately remove the underlying commit object.
+
+### Inspecting the recovered candidate
+
+The commit was inspected using:
+
+```powershell
+git show --stat 782d5f921962cf29a905042db25d8b046ae3cb5e
+```
+
+Commit metadata was inspected using:
+
+```powershell
+git show --format=fuller --no-patch 782d5f921962cf29a905042db25d8b046ae3cb5e
+```
+
+The output confirmed:
+
+- The object was a merge commit.
+- Its message identified the original stash operation.
+- It contained the expected change to `deployment_config.py`.
+- The file change added `get_deployment_owner()`.
+
+### Re-registering the dropped stash
+
+The existing stash commit was restored to the stash list using:
+
+```powershell
+git stash store -m "Recovered dropped deployment owner" 782d5f921962cf29a905042db25d8b046ae3cb5e
+```
+
+The stash was verified:
+
+```powershell
+git stash list
+git stash show -p 'stash@{0}'
+```
+
+The original implementation was present:
+
+```python
+def get_deployment_owner():
+    return "platform-team"
+```
+
+### Applying the recovered stash
+
+The recovered stash was applied:
+
+```powershell
+git stash apply 'stash@{0}'
+```
+
+The change was restored to the working tree as an unstaged modification.
+
+The working-tree state was verified using:
+
+```powershell
+git status -sb
+git diff
+```
+
+The recovered implementation was then staged and committed:
+
+`e63edae test: restore deployment owner from dropped stash`
+
+### Important observations
+
+- `git stash drop` removes the stash reference, not necessarily the underlying Git objects immediately.
+- `git fsck --no-reflogs --unreachable` can help locate unreachable stash commit objects.
+- The output can contain many unrelated unreachable objects, so identifying the correct commit requires inspection.
+- `git stash store` can register an existing stash commit in the stash list again.
+- `git stash apply` restores the recovered changes without removing the newly registered stash entry.
+- A dropped stash is not guaranteed to remain recoverable indefinitely.
+
+Git garbage collection can eventually prune unreachable objects. Therefore, stash recovery should be treated as a recovery possibility, not a substitute for regular commits or backups.
+
+## 11. Experiment Branches and Preserved Work
+
+The practical exercises were maintained in separate branches to isolate the different stash scenarios.
+
+| Branch | Purpose | Key commit |
+|---|---|---|
+| `experiment/stash-source` | Original source-side stash changes | `d79c178` |
+| `experiment/stash-destination` | Cross-branch application and conflict resolution | `dfd74fc` |
+| `recovery/stash-owner` | Original-base recovery and dropped-stash recovery | `e63edae` |
+
+The branches were pushed to the remote repository to preserve the practical work.
+
+They were retained as experiment references rather than merged into `main`.
+
+## 12. Observations and Further Investigation
 
 Several experiments produced results worth revisiting:
 
@@ -309,18 +599,11 @@ Several experiments produced results worth revisiting:
 
 4. **Ignored file capture:** Using `--all` captured Ruff cache files because the cache directory was not excluded by the repository's ignore rules.
 
-These observations should be revisited where useful during future exercises.
+5. **Cross-branch application:** Stash entries can be applied on other branches, but overlapping changes may require manual conflict resolution.
 
-## 9. Remaining Exercises
+6. **Branch-based recovery:** `git stash branch` provides a way to recreate the original base context of a stash.
 
-The following topics remain planned:
-
-- Applying stash entries on a different branch.
-- Understanding branch-related stash conflicts.
-- Using `git stash branch` to recreate the original working context.
-- Recovering dropped stash entries using Git's object database.
-- Further stash inspection and recovery scenarios.
-- Integrated scenarios combining staged, unstaged, untracked, and ignored changes.
+7. **Dropped-stash recovery:** Unreachable stash commit objects can sometimes be located and re-registered, provided they have not been pruned.
 
 ## Validation
 
