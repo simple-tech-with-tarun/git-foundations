@@ -24,3 +24,7 @@ def is_production_deployment():
 
 def get_deployment_region():
     return f"Deployment region: {deployment_config['region']}"
+
+
+def get_deployment_notes_file():
+    return "deployment_notes.txt"
