@@ -20,6 +20,9 @@ The objective is to understand not only how to execute stash commands, but also 
 - Understand branch-based stash recovery.
 - Manage stash entries using `drop` and `clear`.
 - Investigate and recover dropped stash entries using Git's object database.
+- Understand how Git preserves and restores mixed staged and unstaged working-tree states.
+- Combine multiple stash entries while maintaining index-state separation.
+- Manage interrupted development workflows by stashing complete working states, committing urgent fixes, and restoring previous work.
 
 ## Repository Structure
 
@@ -587,7 +590,393 @@ The branches were pushed to the remote repository to preserve the practical work
 
 They were retained as experiment references rather than merged into `main`.
 
-## 12. Observations and Further Investigation
+## 12. Integrated Workflows and Index-State Management
+
+The third phase explored integrated Git stash workflows involving staged and unstaged changes, multiple stash entries, and interrupted development work.
+
+The exercises used `deployment_config.py` to introduce independent modifications across multiple functions while preserving different staging states.
+
+### Mixed staged and unstaged changes
+
+The initial experiment introduced a staged modification to `get_deployment_summary()` followed by an unstaged modification to the same function.
+
+The working-tree status showed:
+
+```text
+MM work-management/exercises/deployment_config.py
+```
+
+This represents a file with both staged and unstaged modifications.
+
+The following commands were used to inspect the differences:
+
+```powershell
+git diff
+git diff --staged
+git diff HEAD
+```
+
+The experiment confirmed:
+
+| Command | Displays |
+|---|---|
+| `git diff` | Unstaged changes compared with the index |
+| `git diff --staged` | Staged changes compared with HEAD |
+| `git diff HEAD` | Combined staged and unstaged changes compared with HEAD |
+
+### Investigating `git stash push --staged`
+
+The `--staged` option was tested with different combinations of staged and unstaged modifications.
+
+The experiments covered:
+
+- Staged and unstaged modifications to the same line.
+- Changes to separate lines with dependencies between the modifications.
+- Independent modifications in separate functions within the same file.
+
+The results demonstrated that:
+
+- Git could create a staged-only stash while retaining the staged snapshot.
+- When dependent unstaged modifications prevented the staged changes from being cleanly removed, Git reported a patch application failure during working-tree cleanup.
+- The stash entry could still be present even when cleanup failed.
+- An independent staged modification in another function could be successfully stashed while leaving the unstaged modification in the working tree.
+
+Example:
+
+```powershell
+git stash push --staged -m "WIP: independent staged-only experiment"
+```
+
+The experiment also showed that a stash being successfully created does not necessarily mean the working tree was successfully cleaned.
+
+### Restoring staged changes with `--index`
+
+The following command was used to restore a staged-only stash:
+
+```powershell
+git stash apply --index 'stash@{2}'
+```
+
+The restored change appeared in the index rather than as an unstaged modification.
+
+The results confirmed that `--index` attempts to restore the original staging state when applying a stash.
+
+Without `--index`, the same staged-only stash was applied with its modification restored as an unstaged change.
+
+An additional experiment attempted to apply a stash while the same file already contained an unstaged local modification.
+
+Git rejected the operation because the local modification could be overwritten.
+
+This demonstrated that stash application is subject to the same working-tree overwrite protections as other Git operations.
+
+### Combining changes from multiple stash entries
+
+Two independent changes were preserved in separate stash entries:
+
+- A staged modification to `get_deployment_summary()`.
+- An unstaged modification to `get_deployment_region()`.
+
+After restoring the staged modification using `--index`, the second stash was applied without `--index`.
+
+Git successfully combined both modifications in the same file.
+
+The resulting status was:
+
+```text
+MM work-management/exercises/deployment_config.py
+```
+
+The staged summary modification remained staged, while the deployment-region modification remained unstaged.
+
+This demonstrated that applying an independent stash does not automatically unstage existing staged changes.
+
+### Preserving an interrupted mixed working-tree state
+
+A final integrated experiment introduced three independent modifications:
+
+```python
+def get_application_name():
+    return f"Application: {deployment_config['application']}"
+
+
+def get_deployment_summary():
+    return "Deployment summary for payment-service"
+
+
+def get_deployment_region():
+    return f"Deployment region: {deployment_config['region']}"
+```
+
+Their initial staging states were:
+
+| Function | Initial state |
+|---|---|
+| `get_deployment_summary()` | Staged |
+| `get_application_name()` | Unstaged |
+| `get_deployment_region()` | Unstaged |
+
+All three modifications were preserved using a normal stash operation:
+
+```powershell
+git stash push -m "WIP: preserve mixed deployment configuration"
+```
+
+The working tree became clean.
+
+The stash was then restored using:
+
+```powershell
+git stash apply --index 'stash@{0}'
+```
+
+The original staging separation was successfully reconstructed.
+
+The restored state was verified using:
+
+```powershell
+git status -sb
+git diff --staged
+git diff
+git diff HEAD
+```
+
+### Key observations
+
+- A normal stash captures both staged and unstaged tracked changes.
+- The stash retains information about the original index state.
+- `--index` attempts to reconstruct the original staged and unstaged separation.
+- Without `--index`, restored changes are not explicitly separated according to their original staging state.
+- Existing staged changes can remain staged when independent changes from another stash are applied.
+- Stash application can be rejected when local modifications would be overwritten.
+- Independent changes within the same file can be combined successfully when their patches do not interfere.
+- A successful stash creation and successful working-tree cleanup are separate outcomes.
+
+
+## 13. Stashing Untracked and Ignored Files Together
+
+This exercise explored how Git handles tracked, untracked, and ignored files when stashing interrupted work.
+
+### 13.1 Stashing Tracked and Untracked Files
+
+The `-u` option includes untracked files in a stash while excluding ignored files.
+
+```powershell
+git stash push -u -m "WIP: tracked and untracked deployment files"
+```
+
+The experiment confirmed that:
+
+- Tracked modifications were captured.
+- Untracked files such as `deployment_notes.txt` were captured.
+- Ignored files such as `deployment.generated.py` remained in the working directory.
+
+### 13.2 Stashing Tracked, Untracked, and Ignored Files
+
+The `--all` option includes ignored files in addition to tracked and untracked changes.
+
+```powershell
+git stash push --all -m "WIP: tracked untracked and ignored deployment files"
+```
+
+The experiment confirmed that the ignored deployment file and generated Ruff cache files were also captured and removed from the working directory.
+
+### 13.3 Inspecting Stashed Untracked and Ignored Files
+
+The default stash summary does not display every file captured by a stash.
+
+The following command displays untracked files in the stash diff:
+
+```powershell
+git stash show -u -p 'stash@{0}'
+```
+
+To inspect the files stored in the third parent of a stash:
+
+```powershell
+git ls-tree -r --name-only 'stash@{0}^3'
+```
+
+The third parent contains the snapshot of untracked files. When `--all` is used, this snapshot also includes ignored files.
+
+The experiment confirmed that both `deployment_notes.txt` and `deployment.generated.py` were present in this tree.
+
+In this experiment, even `git stash show --all -p` did not display the ignored deployment file, although the third-parent tree confirmed that it was stored.
+
+### 13.4 Restoring Ignored Files
+
+Applying a stash created with `--all` can restore ignored files alongside tracked and untracked changes.
+
+```powershell
+git stash apply 'stash@{0}'
+```
+
+The ignored deployment file was deleted manually after the initial restoration and then recovered through another stash application.
+
+During the second application, Git reported errors because some tracked and untracked files already had local changes or existing copies. Despite those errors, the missing ignored deployment file was restored.
+
+This demonstrated that stash application can partially restore files even when the overall operation reports an error.
+
+### 13.5 Key Observations
+
+- `git stash push -u` includes tracked and untracked changes but excludes ignored files.
+- `git stash push --all` includes tracked, untracked, and ignored files.
+- The third parent of a stash stores the untracked-file snapshot and, with `--all`, ignored files as well.
+- `git stash show` output should not be treated as a complete inventory of every file stored in a stash.
+- `git stash apply` can partially restore files even when another part of the operation fails.
+- Ignored files remain excluded from ordinary `git status` output, even after restoration.
+
+## 14. Integrated Interrupted-Work Workflow
+
+The final exercise combined the stash operations explored throughout the third phase into a realistic interrupted-development scenario.
+
+The objective was to preserve an incomplete deployment configuration task, temporarily switch to an independent production fix, commit that fix, and subsequently resume the original work without losing its staging state or additional files.
+
+### 14.1 Preparing Interrupted Work
+
+The exercise introduced multiple changes in `deployment_config.py`:
+
+| Change | Initial state |
+|---|---|
+| Update `get_deployment_summary()` | Staged |
+| Update `get_deployment_region()` | Unstaged |
+| Add `deployment_incident_notes.txt` | Untracked |
+| `deployment.generated.py` | Ignored |
+
+The ignored deployment artifact was verified using:
+
+```powershell
+git check-ignore -v .\work-management\exercises\deployment.generated.py
+```
+
+This established a working state containing four different categories of changes.
+
+### 14.2 Stashing the Complete Working State
+
+All interrupted work was preserved using:
+
+```powershell
+git stash push --all -m "WIP: preserve integrated deployment interruption"
+```
+
+The working tree became clean after the operation.
+
+The stash was inspected using:
+
+```powershell
+git stash show -p 'stash@{0}'
+git stash show -u -p 'stash@{0}'
+```
+
+The third-parent tree was inspected to verify the additional files:
+
+```powershell
+git ls-tree -r --name-only 'stash@{0}^3'
+```
+
+The output included:
+
+- `.ruff_cache` files
+- `work-management/exercises/deployment.generated.py`
+- `work-management/exercises/deployment_incident_notes.txt`
+
+This confirmed that the stash contained the untracked incident notes and ignored deployment artifact.
+
+### 14.3 Committing an Independent Production Fix
+
+While the original work remained stashed, an independent accessor was added to `deployment_config.py`:
+
+```python
+def get_deployment_environment():
+    return deployment_config["environment"]
+```
+
+The file was validated using Ruff before committing.
+
+The production fix was committed separately:
+
+`eed3b6a fix: add deployment environment accessor`
+
+This simulated an urgent change that needed to be committed without including the incomplete development work.
+
+### 14.4 Restoring the Interrupted Work
+
+The original stash was restored using:
+
+```powershell
+git stash apply --index 'stash@{0}'
+```
+
+The `--index` option was used to reconstruct the original staged and unstaged separation.
+
+Git successfully restored:
+
+- The staged deployment summary modification.
+- The unstaged deployment region modification.
+- The untracked incident notes file.
+
+The resulting status was:
+
+```text
+MM work-management/exercises/deployment_config.py
+?? work-management/exercises/deployment_incident_notes.txt
+```
+
+The ignored deployment artifact was also verified to be present with its original contents.
+
+### 14.5 Handling Partial Stash Restoration
+
+Although the tracked changes were restored successfully, Git reported an error during restoration of the additional files:
+
+```text
+.ruff_cache/.gitignore already exists, no checkout
+.ruff_cache/0.17.3/6570452681107847919 already exists, no checkout
+.ruff_cache/CACHEDIR.TAG already exists, no checkout
+error: could not restore untracked files from stash
+```
+
+The error did not prevent all restoration.
+
+Subsequent inspection confirmed that:
+
+- The staged and unstaged modifications were restored.
+- The incident notes file was present.
+- The ignored deployment artifact was present with its original contents.
+
+This demonstrated that stash application can partially fail while still restoring some of the requested changes.
+
+It also highlighted the importance of inspecting the resulting working-tree state rather than assuming that an error means the entire operation was unsuccessful.
+
+### 14.6 Validation and Commit Strategy
+
+After restoration, the exercise directory was validated:
+
+```powershell
+python -m ruff check .\work-management\exercises\
+python -m ruff format --check .\work-management\exercises\
+```
+
+Both checks passed.
+
+The resumed work was committed separately from the urgent production fix:
+
+`1813495 test: resume interrupted deployment workflow`
+
+The incident notes were included in the commit, while the ignored generated deployment artifact remained excluded.
+
+The final working tree was clean, and the original stash was retained for verification.
+
+### 14.7 Key Observations
+
+- A complete interrupted working state can be preserved using `git stash push --all`.
+- An independent production fix can be committed while previous work remains stashed.
+- `git stash apply --index` can restore the original staging separation on top of a subsequent commit.
+- Stash application can report an error while successfully restoring tracked changes and some additional files.
+- Existing untracked or ignored files can interfere with restoration of the stash's additional-file snapshot.
+- Inspecting the third parent provides a useful inventory of files included in the stash.
+- Separate commits keep urgent fixes independent from resumed development work.
+- Retaining the stash until restoration and validation are complete provides an additional recovery reference.
+
+## 15. Observations and Further Investigation
 
 Several experiments produced results worth revisiting:
 

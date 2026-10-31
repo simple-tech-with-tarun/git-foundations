@@ -1,0 +1,1 @@
+Temporary deployment notes for the payment-service.
