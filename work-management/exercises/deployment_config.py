@@ -22,6 +22,10 @@ def is_production_deployment():
     return deployment_config["environment"] == "production"
 
 
+def get_deployment_environment():
+    return deployment_config["environment"]
+
+
 def get_deployment_region():
     return f"Deployment region: {deployment_config['region']}"
 
