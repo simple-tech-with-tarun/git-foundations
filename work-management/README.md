@@ -750,7 +750,81 @@ git diff HEAD
 - Independent changes within the same file can be combined successfully when their patches do not interfere.
 - A successful stash creation and successful working-tree cleanup are separate outcomes.
 
-## 13. Observations and Further Investigation
+
+## 13. Stashing Untracked and Ignored Files Together
+
+This exercise explored how Git handles tracked, untracked, and ignored files when stashing interrupted work.
+
+### 13.1 Stashing Tracked and Untracked Files
+
+The `-u` option includes untracked files in a stash while excluding ignored files.
+
+```powershell
+git stash push -u -m "WIP: tracked and untracked deployment files"
+```
+
+The experiment confirmed that:
+
+- Tracked modifications were captured.
+- Untracked files such as `deployment_notes.txt` were captured.
+- Ignored files such as `deployment.generated.py` remained in the working directory.
+
+### 13.2 Stashing Tracked, Untracked, and Ignored Files
+
+The `--all` option includes ignored files in addition to tracked and untracked changes.
+
+```powershell
+git stash push --all -m "WIP: tracked untracked and ignored deployment files"
+```
+
+The experiment confirmed that the ignored deployment file and generated Ruff cache files were also captured and removed from the working directory.
+
+### 13.3 Inspecting Stashed Untracked and Ignored Files
+
+The default stash summary does not display every file captured by a stash.
+
+The following command displays untracked files in the stash diff:
+
+```powershell
+git stash show -u -p 'stash@{0}'
+```
+
+To inspect the files stored in the third parent of a stash:
+
+```powershell
+git ls-tree -r --name-only 'stash@{0}^3'
+```
+
+The third parent contains the snapshot of untracked files. When `--all` is used, this snapshot also includes ignored files.
+
+The experiment confirmed that both `deployment_notes.txt` and `deployment.generated.py` were present in this tree.
+
+In this experiment, even `git stash show --all -p` did not display the ignored deployment file, although the third-parent tree confirmed that it was stored.
+
+### 13.4 Restoring Ignored Files
+
+Applying a stash created with `--all` can restore ignored files alongside tracked and untracked changes.
+
+```powershell
+git stash apply 'stash@{0}'
+```
+
+The ignored deployment file was deleted manually after the initial restoration and then recovered through another stash application.
+
+During the second application, Git reported errors because some tracked and untracked files already had local changes or existing copies. Despite those errors, the missing ignored deployment file was restored.
+
+This demonstrated that stash application can partially restore files even when the overall operation reports an error.
+
+### 13.5 Key Observations
+
+- `git stash push -u` includes tracked and untracked changes but excludes ignored files.
+- `git stash push --all` includes tracked, untracked, and ignored files.
+- The third parent of a stash stores the untracked-file snapshot and, with `--all`, ignored files as well.
+- `git stash show` output should not be treated as a complete inventory of every file stored in a stash.
+- `git stash apply` can partially restore files even when another part of the operation fails.
+- Ignored files remain excluded from ordinary `git status` output, even after restoration.
+
+## 14. Observations and Further Investigation
 
 Several experiments produced results worth revisiting:
 
