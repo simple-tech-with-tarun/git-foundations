@@ -7,7 +7,7 @@ deployment_config = {
 
 
 def get_application_name():
-    return deployment_config["application"]
+    return f"Application: {deployment_config['application']}"
 
 
 def get_deployment_config():
@@ -15,7 +15,7 @@ def get_deployment_config():
 
 
 def get_deployment_summary():
-    return "Production deployment configuration"
+    return "Deployment summary for payment-service"
 
 
 def is_production_deployment():
@@ -23,4 +23,4 @@ def is_production_deployment():
 
 
 def get_deployment_region():
-    return deployment_config["region"]
+    return f"Deployment region: {deployment_config['region']}"
