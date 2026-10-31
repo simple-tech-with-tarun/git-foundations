@@ -24,3 +24,7 @@ def is_production_deployment():
 
 def get_deployment_region():
     return deployment_config["region"]
+
+
+def get_deployment_owner():
+    return "infrastructure-team"
