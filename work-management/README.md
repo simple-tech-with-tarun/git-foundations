@@ -20,6 +20,8 @@ The objective is to understand not only how to execute stash commands, but also 
 - Understand branch-based stash recovery.
 - Manage stash entries using `drop` and `clear`.
 - Investigate and recover dropped stash entries using Git's object database.
+- Understand how Git preserves and restores mixed staged and unstaged working-tree states.
+- Combine multiple stash entries while maintaining index-state separation.
 
 ## Repository Structure
 
@@ -587,7 +589,168 @@ The branches were pushed to the remote repository to preserve the practical work
 
 They were retained as experiment references rather than merged into `main`.
 
-## 12. Observations and Further Investigation
+## 12. Integrated Workflows and Index-State Management
+
+The third phase explored integrated Git stash workflows involving staged and unstaged changes, multiple stash entries, and interrupted development work.
+
+The exercises used `deployment_config.py` to introduce independent modifications across multiple functions while preserving different staging states.
+
+### Mixed staged and unstaged changes
+
+The initial experiment introduced a staged modification to `get_deployment_summary()` followed by an unstaged modification to the same function.
+
+The working-tree status showed:
+
+```text
+MM work-management/exercises/deployment_config.py
+```
+
+This represents a file with both staged and unstaged modifications.
+
+The following commands were used to inspect the differences:
+
+```powershell
+git diff
+git diff --staged
+git diff HEAD
+```
+
+The experiment confirmed:
+
+| Command | Displays |
+|---|---|
+| `git diff` | Unstaged changes compared with the index |
+| `git diff --staged` | Staged changes compared with HEAD |
+| `git diff HEAD` | Combined staged and unstaged changes compared with HEAD |
+
+### Investigating `git stash push --staged`
+
+The `--staged` option was tested with different combinations of staged and unstaged modifications.
+
+The experiments covered:
+
+- Staged and unstaged modifications to the same line.
+- Changes to separate lines with dependencies between the modifications.
+- Independent modifications in separate functions within the same file.
+
+The results demonstrated that:
+
+- Git could create a staged-only stash while retaining the staged snapshot.
+- When dependent unstaged modifications prevented the staged changes from being cleanly removed, Git reported a patch application failure during working-tree cleanup.
+- The stash entry could still be present even when cleanup failed.
+- An independent staged modification in another function could be successfully stashed while leaving the unstaged modification in the working tree.
+
+Example:
+
+```powershell
+git stash push --staged -m "WIP: independent staged-only experiment"
+```
+
+The experiment also showed that a stash being successfully created does not necessarily mean the working tree was successfully cleaned.
+
+### Restoring staged changes with `--index`
+
+The following command was used to restore a staged-only stash:
+
+```powershell
+git stash apply --index 'stash@{2}'
+```
+
+The restored change appeared in the index rather than as an unstaged modification.
+
+The results confirmed that `--index` attempts to restore the original staging state when applying a stash.
+
+Without `--index`, the same staged-only stash was applied with its modification restored as an unstaged change.
+
+An additional experiment attempted to apply a stash while the same file already contained an unstaged local modification.
+
+Git rejected the operation because the local modification could be overwritten.
+
+This demonstrated that stash application is subject to the same working-tree overwrite protections as other Git operations.
+
+### Combining changes from multiple stash entries
+
+Two independent changes were preserved in separate stash entries:
+
+- A staged modification to `get_deployment_summary()`.
+- An unstaged modification to `get_deployment_region()`.
+
+After restoring the staged modification using `--index`, the second stash was applied without `--index`.
+
+Git successfully combined both modifications in the same file.
+
+The resulting status was:
+
+```text
+MM work-management/exercises/deployment_config.py
+```
+
+The staged summary modification remained staged, while the deployment-region modification remained unstaged.
+
+This demonstrated that applying an independent stash does not automatically unstage existing staged changes.
+
+### Preserving an interrupted mixed working-tree state
+
+A final integrated experiment introduced three independent modifications:
+
+```python
+def get_application_name():
+    return f"Application: {deployment_config['application']}"
+
+
+def get_deployment_summary():
+    return "Deployment summary for payment-service"
+
+
+def get_deployment_region():
+    return f"Deployment region: {deployment_config['region']}"
+```
+
+Their initial staging states were:
+
+| Function | Initial state |
+|---|---|
+| `get_deployment_summary()` | Staged |
+| `get_application_name()` | Unstaged |
+| `get_deployment_region()` | Unstaged |
+
+All three modifications were preserved using a normal stash operation:
+
+```powershell
+git stash push -m "WIP: preserve mixed deployment configuration"
+```
+
+The working tree became clean.
+
+The stash was then restored using:
+
+```powershell
+git stash apply --index 'stash@{0}'
+```
+
+The original staging separation was successfully reconstructed.
+
+The restored state was verified using:
+
+```powershell
+git status -sb
+git diff --staged
+git diff
+git diff HEAD
+```
+
+### Key observations
+
+- A normal stash captures both staged and unstaged tracked changes.
+- The stash retains information about the original index state.
+- `--index` attempts to reconstruct the original staged and unstaged separation.
+- Without `--index`, restored changes are not explicitly separated according to their original staging state.
+- Existing staged changes can remain staged when independent changes from another stash are applied.
+- Stash application can be rejected when local modifications would be overwritten.
+- Independent changes within the same file can be combined successfully when their patches do not interfere.
+- A successful stash creation and successful working-tree cleanup are separate outcomes.
+
+## 13. Observations and Further Investigation
 
 Several experiments produced results worth revisiting:
 
