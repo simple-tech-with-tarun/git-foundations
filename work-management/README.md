@@ -22,6 +22,7 @@ The objective is to understand not only how to execute stash commands, but also 
 - Investigate and recover dropped stash entries using Git's object database.
 - Understand how Git preserves and restores mixed staged and unstaged working-tree states.
 - Combine multiple stash entries while maintaining index-state separation.
+- Manage interrupted development workflows by stashing complete working states, committing urgent fixes, and restoring previous work.
 
 ## Repository Structure
 
@@ -824,7 +825,158 @@ This demonstrated that stash application can partially restore files even when t
 - `git stash apply` can partially restore files even when another part of the operation fails.
 - Ignored files remain excluded from ordinary `git status` output, even after restoration.
 
-## 14. Observations and Further Investigation
+## 14. Integrated Interrupted-Work Workflow
+
+The final exercise combined the stash operations explored throughout the third phase into a realistic interrupted-development scenario.
+
+The objective was to preserve an incomplete deployment configuration task, temporarily switch to an independent production fix, commit that fix, and subsequently resume the original work without losing its staging state or additional files.
+
+### 14.1 Preparing Interrupted Work
+
+The exercise introduced multiple changes in `deployment_config.py`:
+
+| Change | Initial state |
+|---|---|
+| Update `get_deployment_summary()` | Staged |
+| Update `get_deployment_region()` | Unstaged |
+| Add `deployment_incident_notes.txt` | Untracked |
+| `deployment.generated.py` | Ignored |
+
+The ignored deployment artifact was verified using:
+
+```powershell
+git check-ignore -v .\work-management\exercises\deployment.generated.py
+```
+
+This established a working state containing four different categories of changes.
+
+### 14.2 Stashing the Complete Working State
+
+All interrupted work was preserved using:
+
+```powershell
+git stash push --all -m "WIP: preserve integrated deployment interruption"
+```
+
+The working tree became clean after the operation.
+
+The stash was inspected using:
+
+```powershell
+git stash show -p 'stash@{0}'
+git stash show -u -p 'stash@{0}'
+```
+
+The third-parent tree was inspected to verify the additional files:
+
+```powershell
+git ls-tree -r --name-only 'stash@{0}^3'
+```
+
+The output included:
+
+- `.ruff_cache` files
+- `work-management/exercises/deployment.generated.py`
+- `work-management/exercises/deployment_incident_notes.txt`
+
+This confirmed that the stash contained the untracked incident notes and ignored deployment artifact.
+
+### 14.3 Committing an Independent Production Fix
+
+While the original work remained stashed, an independent accessor was added to `deployment_config.py`:
+
+```python
+def get_deployment_environment():
+    return deployment_config["environment"]
+```
+
+The file was validated using Ruff before committing.
+
+The production fix was committed separately:
+
+`eed3b6a fix: add deployment environment accessor`
+
+This simulated an urgent change that needed to be committed without including the incomplete development work.
+
+### 14.4 Restoring the Interrupted Work
+
+The original stash was restored using:
+
+```powershell
+git stash apply --index 'stash@{0}'
+```
+
+The `--index` option was used to reconstruct the original staged and unstaged separation.
+
+Git successfully restored:
+
+- The staged deployment summary modification.
+- The unstaged deployment region modification.
+- The untracked incident notes file.
+
+The resulting status was:
+
+```text
+MM work-management/exercises/deployment_config.py
+?? work-management/exercises/deployment_incident_notes.txt
+```
+
+The ignored deployment artifact was also verified to be present with its original contents.
+
+### 14.5 Handling Partial Stash Restoration
+
+Although the tracked changes were restored successfully, Git reported an error during restoration of the additional files:
+
+```text
+.ruff_cache/.gitignore already exists, no checkout
+.ruff_cache/0.17.3/6570452681107847919 already exists, no checkout
+.ruff_cache/CACHEDIR.TAG already exists, no checkout
+error: could not restore untracked files from stash
+```
+
+The error did not prevent all restoration.
+
+Subsequent inspection confirmed that:
+
+- The staged and unstaged modifications were restored.
+- The incident notes file was present.
+- The ignored deployment artifact was present with its original contents.
+
+This demonstrated that stash application can partially fail while still restoring some of the requested changes.
+
+It also highlighted the importance of inspecting the resulting working-tree state rather than assuming that an error means the entire operation was unsuccessful.
+
+### 14.6 Validation and Commit Strategy
+
+After restoration, the exercise directory was validated:
+
+```powershell
+python -m ruff check .\work-management\exercises\
+python -m ruff format --check .\work-management\exercises\
+```
+
+Both checks passed.
+
+The resumed work was committed separately from the urgent production fix:
+
+`1813495 test: resume interrupted deployment workflow`
+
+The incident notes were included in the commit, while the ignored generated deployment artifact remained excluded.
+
+The final working tree was clean, and the original stash was retained for verification.
+
+### 14.7 Key Observations
+
+- A complete interrupted working state can be preserved using `git stash push --all`.
+- An independent production fix can be committed while previous work remains stashed.
+- `git stash apply --index` can restore the original staging separation on top of a subsequent commit.
+- Stash application can report an error while successfully restoring tracked changes and some additional files.
+- Existing untracked or ignored files can interfere with restoration of the stash's additional-file snapshot.
+- Inspecting the third parent provides a useful inventory of files included in the stash.
+- Separate commits keep urgent fixes independent from resumed development work.
+- Retaining the stash until restoration and validation are complete provides an additional recovery reference.
+
+## 15. Observations and Further Investigation
 
 Several experiments produced results worth revisiting:
 
