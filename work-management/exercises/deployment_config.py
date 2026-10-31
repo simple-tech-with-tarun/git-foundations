@@ -27,4 +27,4 @@ def get_deployment_region():
 
 
 def get_deployment_owner():
-    return "infrastructure-team"
+    return "platform-team"
