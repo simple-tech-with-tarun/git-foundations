@@ -24,7 +24,7 @@ The chapter is divided into five practical learning phases.
 
 ### 1. Advanced Git History Investigation
 
-**Status:** Completed — Practical work documented
+**Status:** Completed - Practical work documented
 
 Investigate complex repository histories and understand how commits, branches, and merges relate to each other.
 
@@ -51,7 +51,7 @@ The repository contains dedicated history investigation exercises and deliberate
 
 ### 2. Tracing Code Changes and Contributions
 
-**Status:** Completed — Practical work documented
+**Status:** Completed - Practical work documented
 
 Investigate when code was introduced, how it evolved, and how changes moved between files and contributors.
 
@@ -83,28 +83,32 @@ The exercise demonstrates how to trace code origins, investigate historical modi
 
 ### 3. Advanced Git Bisect and Regression Detection
 
-**Status:** Planned
+**Status:** Completed - Practical work documented
 
-Identify regression-introducing commits using Git's binary-search capabilities and automated testing.
+Identify regression-introducing commits using Git's binary-search capabilities, automated testing, and structured investigation workflows.
 
 Topics:
 
-- Manual Git bisect workflows.
-- Skipping untestable commits.
+- Manual Git bisect workflows and good/bad boundaries.
+- Skipping untestable commits using `git bisect skip`.
+- Bisect investigation history using `git bisect log` and `git bisect visualize`.
 - Automated regression detection using `git bisect run`.
-- Exit codes and test-script behaviour.
-- Merge-related regression investigation.
-- Bisect recovery and reproducibility.
+- Test-script exit codes and untestable revisions.
+- Merge-related regression investigation and commit ancestry.
+- Recovery from incorrect bisect classifications.
+- Bisect reproducibility and log replay limitations.
 
-Planned exercises:
+Practical exercises documented:
 
 - Manual regression investigation.
 - Skipped and untestable commits.
-- Automated bisect.
-- Merge-related regression.
+- Automated regression investigation.
+- Merge-related regression investigation.
 - Bisect recovery and reproducibility.
 
-**Supporting repository:** Practical exercises to be developed.
+**Supporting repository:** [Git Bisect Lab](https://github.com/simple-tech-with-tarun/git-bisect-lab)
+
+The repository contains five practical exercises covering manual and automated regression detection, skipped commits, merge-related regressions, and recovery from incorrect bisect decisions. Each exercise includes documented scenarios, commands, observations, and validation evidence.
 
 ### 4. Repository Forensics and Historical Reconstruction
 
@@ -174,7 +178,7 @@ Planned exercises:
 
 ## Related Practical Repositories
 
-This chapter is supported by three dedicated Git learning repositories. Each repository focuses on a different aspect of Git history investigation, object storage, repository maintenance, and recovery.
+This chapter is supported by four dedicated Git learning repositories. Each repository focuses on a different aspect of Git history investigation, object storage, repository maintenance, and recovery.
 
 ### 1. Git Debugging Lab
 
@@ -213,7 +217,31 @@ git ls-tree -r <tree>
 git hash-object <file>
 ```
 
-### 2. Git Packfile Lab
+### 2. Git Bisect Lab
+
+Repository: [simple-tech-with-tarun/git-bisect-lab](https://github.com/simple-tech-with-tarun/git-bisect-lab)
+
+Purpose:
+
+A hands-on repository for learning advanced Git bisect techniques, identifying regression-introducing commits, automating regression investigations, and handling complex Git histories.
+
+Key learning areas:
+
+- Manual regression investigation and bisect boundaries.
+- Skipped and untestable commits.
+- Automated regression testing using `git bisect run`.
+- Merge-related regression investigation.
+- Recovery from incorrect bisect classifications.
+- Bisect investigation logs and reproducibility.
+
+Exercise documentation:
+
+- [Manual and skipped-commit bisect exercises](https://github.com/simple-tech-with-tarun/git-bisect-lab/tree/main/01-manual-bisect)
+- [Automated bisect](https://github.com/simple-tech-with-tarun/git-bisect-lab/tree/main/02-automated-bisect)
+- [Merge-related bisect](https://github.com/simple-tech-with-tarun/git-bisect-lab/tree/main/03-merge-bisect)
+- [Bisect recovery](https://github.com/simple-tech-with-tarun/git-bisect-lab/tree/main/04-bisect-recovery)
+
+### 3. Git Packfile Lab
 
 Repository: [simple-tech-with-tarun/git-packfile-lab](https://github.com/simple-tech-with-tarun/git-packfile-lab)
 
@@ -250,7 +278,7 @@ git fsck --full
 
 The experiments demonstrate how Git stores objects efficiently and how repository maintenance operations reorganize the object database.
 
-### 3. Git Cruft Pack Lab
+### 4. Git Cruft Pack Lab
 
 Repository: [simple-tech-with-tarun/git-cruft-pack-lab](https://github.com/simple-tech-with-tarun/git-cruft-pack-lab)
 
@@ -300,7 +328,7 @@ The experiments demonstrate that deleting a branch does not immediately delete i
 |---|---|---|
 | Advanced Git History Investigation | Git Debugging Lab | Completed — verification pending |
 | Tracing Code Changes and Contributions | Git Debugging Lab | Completed — verification pending |
-| Advanced Git Bisect and Regression Detection | To be developed | Planned |
+| Advanced Git Bisect and Regression Detection | Git Bisect Lab | Completed - verification pending |
 | Repository Forensics and Historical Reconstruction | Git Debugging Lab, Git Packfile Lab, Git Cruft Pack Lab | Partially supported |
 | Integrated Git Debugging and Investigation Workflows | To be determined | Planned |
 
@@ -338,7 +366,7 @@ Only completed exercises and verified findings will be marked as completed.
 |---|---|---|
 | 1 | Advanced Git History Investigation | Completed — verification pending |
 | 2 | Tracing Code Changes and Contributions | Completed — verification pending |
-| 3 | Advanced Git Bisect and Regression Detection | Planned |
+| 3 | Advanced Git Bisect and Regression Detection | Completed — verification pending |
 | 4 | Repository Forensics and Historical Reconstruction | Partially supported — verification pending |
 | 5 | Integrated Git Debugging and Investigation Workflows | Planned |
 
