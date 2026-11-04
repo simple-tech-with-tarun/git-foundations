@@ -130,6 +130,7 @@ Topics:
 - Cruft pack creation, retention, and expiration.
 - Commit and patch investigation using `git patch-id`.
 - Equivalent change identification using `git cherry`.
+- Rebase and cherry-pick effects on commit identity and patch equivalence.
 - Reflog-based commit recovery.
 
 Practical exercises and investigations:
@@ -144,6 +145,7 @@ Practical exercises and investigations:
 - Commit metadata and raw diff inspection.
 - Patch equivalence investigation using `git patch-id`.
 - Duplicate change identification using `git cherry`.
+- Rebase and cherry-pick commit identity and patch equivalence investigation.
 - Packfile inspection and verification.
 - Delta compression and garbage collection.
 - Cruft pack creation, inspection, and expiration.
@@ -209,6 +211,7 @@ Key learning areas:
 - Commit, tree, and blob relationship investigation.
 - Patch equivalence analysis using `git patch-id`.
 - Identifying equivalent changes using `git cherry`.
+- Rebase and cherry-pick effects on commit identity.
 - Raw commit metadata and diff investigation.
 
 Important commands documented in the repository:
