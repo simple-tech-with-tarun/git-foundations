@@ -112,7 +112,7 @@ The repository contains five practical exercises covering manual and automated r
 
 ### 4. Repository Forensics and Historical Reconstruction
 
-**Status:** Partially supported by completed sibling repositories — Issue verification pending
+**Status:** Completed - Practical work documented
 
 Investigate historical repository states, Git objects, references, and commits that are no longer reachable through ordinary branch history.
 
@@ -121,25 +121,32 @@ Topics:
 - Historical file and commit inspection.
 - Git blobs, trees, commits, and tags.
 - Loose and packed Git objects.
-- Packfile creation and inspection.
+- Packfile creation, inspection, and verification.
 - Delta compression and delta chains.
-- References, `HEAD`, and reflogs.
+- Direct and symbolic references.
+- Attached and detached HEAD states.
+- Reflog investigation and historical reference movements.
 - Dangling and unreachable objects.
-- Cruft pack creation and expiration.
+- Cruft pack creation, retention, and expiration.
 - Commit and patch investigation using `git patch-id`.
+- Equivalent change identification using `git cherry`.
+- Reflog-based commit recovery.
 
-Practical exercises documented across sibling repositories:
+Practical exercises and investigations:
 
-- Dangling tree recovery.
+- Historical file reconstruction and retrieval.
 - Git object inspection and reconstruction.
-- Loose object and packed object comparison.
+- Loose object creation and inspection using `git hash-object`.
+- Commit, tree, and blob relationship investigation.
+- Symbolic reference and detached HEAD investigation.
+- Dangling tree recovery.
+- Reflog-based lost commit investigation and recovery.
+- Commit metadata and raw diff inspection.
+- Patch equivalence investigation using `git patch-id`.
+- Duplicate change identification using `git cherry`.
 - Packfile inspection and verification.
-- Delta compression analysis.
-- Garbage collection and repacking.
-- Reflog expiration.
-- Unreachable object investigation.
-- Cruft pack creation and inspection.
-- Unreachable object expiration and removal.
+- Delta compression and garbage collection.
+- Cruft pack creation, inspection, and expiration.
 
 **Supporting repositories:**
 
@@ -147,9 +154,7 @@ Practical exercises documented across sibling repositories:
 2. [Git Packfile Lab](https://github.com/simple-tech-with-tarun/git-packfile-lab)
 3. [Git Cruft Pack Lab](https://github.com/simple-tech-with-tarun/git-cruft-pack-lab)
 
-These repositories provide practical examples of Git object storage, repository maintenance, unreachable object recovery, and historical reconstruction.
-
-The proposed commands and exercises for this phase must still be checked against the original sub-issue before marking it complete.
+The Git Debugging Lab contains practical investigation and recovery exercises with documented findings and validation evidence. The Git Packfile Lab and Git Cruft Pack Lab cover practical exercises involving object storage, packfile creation and verification, delta compression, repository maintenance, cruft pack lifecycle, and unreachable object recovery.
 
 ### 5. Integrated Git Debugging and Investigation Workflows
 
@@ -198,12 +203,21 @@ Key learning areas:
 - Exact-string and regular-expression history searches.
 - Git trees, blobs, commits, and unreachable objects.
 - Dangling tree recovery and evidence preservation.
+- Reflog investigation and HEAD movement analysis.
+- Symbolic references, direct references, and detached HEAD.
+- Recovery of commits removed from branch history.
+- Commit, tree, and blob relationship investigation.
+- Patch equivalence analysis using `git patch-id`.
+- Identifying equivalent changes using `git cherry`.
+- Raw commit metadata and diff investigation.
 
 Important commands documented in the repository:
 
 ```bash
 git log --graph --oneline --all
 git show <commit>
+git show --format=fuller <commit>
+git show --raw --format=fuller <commit>
 git diff <branch1> <branch2>
 
 git blame
@@ -211,10 +225,19 @@ git log -S
 git log -G
 git log --follow
 
+git reflog --date=local
+git reset --hard <commit>
+
 git fsck --full --unreachable
+git cat-file -t <object>
+git cat-file -s <object>
 git cat-file -p <object>
 git ls-tree -r <tree>
 git hash-object <file>
+git hash-object -w <file>
+
+git patch-id --stable
+git cherry <upstream> <head>
 ```
 
 ### 2. Git Bisect Lab
@@ -276,7 +299,7 @@ git verify-pack -v <pack-index-file>
 git fsck --full
 ```
 
-The experiments demonstrate how Git stores objects efficiently and how repository maintenance operations reorganize the object database.
+The repository demonstrates how Git stores objects efficiently and how repository maintenance operations reorganize the object database. The practical exercises cover loose and packed objects, delta compression, packfile verification, garbage collection, and reflog expiration.
 
 ### 4. Git Cruft Pack Lab
 
@@ -320,7 +343,7 @@ git repack -d --cruft --cruft-expiration="2.weeks.ago"
 git repack -d --cruft --cruft-expiration=now
 ```
 
-The experiments demonstrate that deleting a branch does not immediately delete its commits and that unreachable objects can remain recoverable while retained in cruft packs.
+The repository demonstrates how deleting a branch and expiring reflog entries can leave objects unreachable, how Git stores those objects in cruft packs, and how expiration and pruning affect their retention.
 
 ## Relationship to the Learning Roadmap
 
@@ -329,7 +352,7 @@ The experiments demonstrate that deleting a branch does not immediately delete i
 | Advanced Git History Investigation | Git Debugging Lab | Completed — verification pending |
 | Tracing Code Changes and Contributions | Git Debugging Lab | Completed — verification pending |
 | Advanced Git Bisect and Regression Detection | Git Bisect Lab | Completed - verification pending |
-| Repository Forensics and Historical Reconstruction | Git Debugging Lab, Git Packfile Lab, Git Cruft Pack Lab | Partially supported |
+| Repository Forensics and Historical Reconstruction | Git Debugging Lab, Git Packfile Lab, Git Cruft Pack Lab | Completed - practical work documented |
 | Integrated Git Debugging and Investigation Workflows | To be determined | Planned |
 
 ## Working Approach
@@ -367,7 +390,7 @@ Only completed exercises and verified findings will be marked as completed.
 | 1 | Advanced Git History Investigation | Completed — verification pending |
 | 2 | Tracing Code Changes and Contributions | Completed — verification pending |
 | 3 | Advanced Git Bisect and Regression Detection | Completed — verification pending |
-| 4 | Repository Forensics and Historical Reconstruction | Partially supported — verification pending |
+| 4 | Repository Forensics and Historical Reconstruction | Completed - practical work documented |
 | 5 | Integrated Git Debugging and Investigation Workflows | Planned |
 
 ## Completion Criteria
