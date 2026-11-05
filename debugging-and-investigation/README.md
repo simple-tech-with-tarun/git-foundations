@@ -1,4 +1,3 @@
-
 # Debugging and Investigation
 
 This chapter focuses on advanced Git techniques for investigating repository history, tracing code changes, identifying regressions, and reconstructing historical repository states.
@@ -160,9 +159,9 @@ The Git Debugging Lab contains practical investigation and recovery exercises wi
 
 ### 5. Integrated Git Debugging and Investigation Workflows
 
-**Status:** Planned
+**Status:** Completed - Practical work documented
 
-Combine the techniques from the previous phases to investigate realistic repository problems.
+Combine the techniques from the previous phases to investigate realistic repository problems through integrated, evidence-based workflows.
 
 Topics:
 
@@ -173,7 +172,7 @@ Topics:
 - Evidence-based investigation reporting.
 - Combining Git history and object-level investigation techniques.
 
-Planned exercises:
+Completed exercises:
 
 - Production regression investigation.
 - Merge-introduced defect investigation.
@@ -181,7 +180,11 @@ Planned exercises:
 - Advanced repository investigation.
 - End-to-end investigation report.
 
-**Supporting repository:** To be determined based on the integrated exercise requirements.
+**Supporting repository:** [Git Debugging Lab](https://github.com/simple-tech-with-tarun/git-debugging-lab)
+
+Exercise documentation: [Integrated Git Debugging and Investigation Workflows](https://github.com/simple-tech-with-tarun/git-debugging-lab/tree/main/integrated-investigation-workflows)
+
+All five exercises are documented with practical scenarios, investigation commands, findings, and validation evidence.
 
 ## Related Practical Repositories
 
@@ -352,11 +355,11 @@ The repository demonstrates how deleting a branch and expiring reflog entries ca
 
 | Learning Phase | Supporting Repository | Status |
 |---|---|---|
-| Advanced Git History Investigation | Git Debugging Lab | Completed — verification pending |
-| Tracing Code Changes and Contributions | Git Debugging Lab | Completed — verification pending |
+| Advanced Git History Investigation | Git Debugging Lab | Completed - verification pending |
+| Tracing Code Changes and Contributions | Git Debugging Lab | Completed - verification pending |
 | Advanced Git Bisect and Regression Detection | Git Bisect Lab | Completed - verification pending |
 | Repository Forensics and Historical Reconstruction | Git Debugging Lab, Git Packfile Lab, Git Cruft Pack Lab | Completed - practical work documented |
-| Integrated Git Debugging and Investigation Workflows | To be determined | Planned |
+| Integrated Git Debugging and Investigation Workflows | Git Debugging Lab | Completed - practical work documented |
 
 ## Working Approach
 
@@ -390,11 +393,11 @@ Only completed exercises and verified findings will be marked as completed.
 
 | Phase | Topic | Status |
 |---|---|---|
-| 1 | Advanced Git History Investigation | Completed — verification pending |
-| 2 | Tracing Code Changes and Contributions | Completed — verification pending |
-| 3 | Advanced Git Bisect and Regression Detection | Completed — verification pending |
+| 1 | Advanced Git History Investigation | Completed - verification pending |
+| 2 | Tracing Code Changes and Contributions | Completed - verification pending |
+| 3 | Advanced Git Bisect and Regression Detection | Completed - verification pending |
 | 4 | Repository Forensics and Historical Reconstruction | Completed - practical work documented |
-| 5 | Integrated Git Debugging and Investigation Workflows | Planned |
+| 5 | Integrated Git Debugging and Investigation Workflows | Completed - practical work documented |
 
 ## Completion Criteria
 

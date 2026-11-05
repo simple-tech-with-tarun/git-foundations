@@ -39,7 +39,7 @@ The advanced section builds on the fundamentals through focused topics, practica
 | [Advanced Branching](advanced-branching/README.md) | Cherry-picking, branch integration, and advanced conflict resolution | Completed |
 | [Recovery and Undo](recovery-and-undo/README.md) | Restoring changes, resetting and reverting commits, reflog, and recovering work | Completed |
 | [Work Management](work-management/README.md) | Stashing changes and managing interrupted work | Completed |
-| [Debugging and Investigation](debugging-and-investigation/README.md) | History investigation, code attribution, regression detection, and repository forensics | In Progress |
+| [Debugging and Investigation](debugging-and-investigation/README.md) | History investigation, code attribution, regression detection, repository forensics, and integrated debugging workflows | Completed |
 | [Git Internals](git-internals/README.md) | Objects, references, HEAD, and the internal structure of a repository | Planned |
 
 Each advanced topic has, or will have, its own directory containing learning materials, practical exercises, and supporting documentation. Topics are developed incrementally, validated through hands-on practice, and integrated into `main` through pull requests.
