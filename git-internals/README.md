@@ -66,16 +66,18 @@ Examine the physical repository structure, staging index, object storage, packfi
 
 ### 4. Commit Graphs and Object Relationships
 
+<badge color="success">Completed</badge>
+
 [Exercise 4: Commit Graphs and Object Relationships](./exercises/04-commit-graphs/README.md)
 
 Explore commit ancestry, parent relationships, snapshots, branching, merging, and graph traversal.
 
 **Key commands:**
-- `git log`
-- `git rev-list`
+- `git log --graph`
+- `git rev-list --parents`
 - `git merge-base`
-- `git cat-file`
-- `git show`
+- `git rev-list --left-right --count`
+- `git diff`
 
 ### 5. Object Lifecycle and Maintenance
 
