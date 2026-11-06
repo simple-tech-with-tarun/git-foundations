@@ -51,16 +51,18 @@ Investigate how Git references identify commits, how HEAD tracks the current pos
 
 ### 3. Repository Internals
 
+<badge color="success">Completed</badge>
+
 [Exercise 3: Repository Internals](./exercises/03-repository-internals/README.md)
 
 Examine the physical repository structure, staging index, object storage, packfiles, and repository configuration.
 
 **Key commands:**
 - `git ls-files --stage`
-- `git count-objects`
-- `git verify-pack`
-- `git pack-refs`
-- `git config`
+- `git count-objects -v`
+- `git cat-file`
+- `git verify-pack -v`
+- `git symbolic-ref`
 
 ### 4. Commit Graphs and Object Relationships
 
