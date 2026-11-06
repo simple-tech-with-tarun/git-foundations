@@ -36,6 +36,8 @@ Explore Git's content-addressable storage and inspect blob, tree, commit, and an
 
 ### 2. References and HEAD
 
+<badge color="success">Completed</badge>
+
 [Exercise 2: References and HEAD](./exercises/02-reference-and-head/README.md)
 
 Investigate how Git references identify commits, how HEAD tracks the current position, and what happens during detached HEAD operations.
