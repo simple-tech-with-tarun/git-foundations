@@ -81,6 +81,8 @@ Explore commit ancestry, parent relationships, snapshots, branching, merging, an
 
 ### 5. Object Lifecycle and Maintenance
 
+<badge color="success">Completed</badge>
+
 [Exercise 5: Object Lifecycle and Maintenance](./exercises/05-object-lifecycle/README.md)
 
 Investigate object reachability, reflog retention, dangling objects, garbage collection, pruning, and repository maintenance.
