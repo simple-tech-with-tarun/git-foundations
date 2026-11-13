@@ -37,6 +37,7 @@ The advanced section builds on the fundamentals through focused topics, practica
 |---|---|---|
 | [History Rewriting](history-rewriting/README.md) | Rebasing, interactive rebase, amending commits, and squashing changes | Completed |
 | [Advanced Branching](advanced-branching/README.md) | Cherry-picking, branch integration, and advanced conflict resolution | Completed |
+| [Git Branching Strategies](branching-strategies/README.md) | GitHub Flow, Git Flow, Trunk-Based Development, and branching strategy selection | In Progress |
 | [Recovery and Undo](recovery-and-undo/README.md) | Restoring changes, resetting and reverting commits, reflog, and recovering work | Completed |
 | [Work Management](work-management/README.md) | Stashing changes and managing interrupted work | Completed |
 | [Debugging and Investigation](debugging-and-investigation/README.md) | History investigation, code attribution, regression detection, repository forensics, and integrated debugging workflows | Completed |
