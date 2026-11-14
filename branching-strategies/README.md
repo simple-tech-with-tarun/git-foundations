@@ -47,9 +47,9 @@ Practise the GitHub Flow workflow using short-lived feature branches and pull re
 
 ### Exercise 2: Git Flow
 
-**Status:** Planned
+**Status:** Completed
 
-Practise the Git Flow lifecycle, including feature development, release preparation, and production hotfixes.
+Practise the Git Flow lifecycle, including feature development, release preparation, production hotfixes, and branch synchronization.
 
 [View Exercise](exercises/02-git-flow/README.md)
 
