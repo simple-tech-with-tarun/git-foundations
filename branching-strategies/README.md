@@ -55,9 +55,13 @@ Practise the Git Flow lifecycle, including feature development, release preparat
 
 ### Exercise 3: Trunk-Based Development
 
-**Status:** Planned
+**Status:** Fundamentals Completed — Advanced Practice Pending
 
-Simulate frequent integration of small changes into the main branch using short-lived branches.
+Learn the fundamentals of Trunk-Based Development using short-lived feature branches, frequent integration into the main branch, fast-forward-only merges, and automated quality checks.
+
+The exercise uses the Deployment Readiness Checker as a practical case study.
+
+Advanced practice will cover multiple contributors, merge conflicts, broken trunk recovery, feature flags, CI/CD, and realistic team simulations.
 
 [View Exercise](exercises/03-trunk-based-development/README.md)
 
