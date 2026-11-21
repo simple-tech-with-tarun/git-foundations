@@ -55,7 +55,7 @@ Practise the Git Flow lifecycle, including feature development, release preparat
 
 ### Exercise 3: Trunk-Based Development
 
-**Status:** Fundamentals and Advanced Practice Completed
+**Status:** Completed
 
 Learn Trunk-Based Development using short-lived feature branches, frequent integration into the main branch, GitHub Pull Requests, automated CI checks, and continuous trunk health verification.
 
@@ -71,7 +71,7 @@ Advanced practice covered:
 - Backward-compatible changes.
 - Keeping the trunk releasable.
 
-The next learning stage covers CI/CD, release management, and realistic team simulations.
+Subsequent practice explored CI/CD and release management using the Deployment Readiness Checker project. These topics are documented separately and are not part of this Trunk-Based Development exercise.
 
 [View Exercise](exercises/03-trunk-based-development/README.md)
 
