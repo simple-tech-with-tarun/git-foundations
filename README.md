@@ -87,3 +87,12 @@ The repository is intended to serve as both a structured learning path and a lon
 > Public availability does not automatically grant permission to reproduce, republish, redistribute, or commercially exploit original materials. Please review the [Copyright & Intellectual Property Notice](https://github.com/simple-tech-with-tarun/simple-tech-with-tarun/blob/main/COPYRIGHT.md) before reusing such materials.
 >
 > Any explicit repository-level or file-level license governs the materials it covers. Third-party content and contributions remain subject to their respective ownership rights, licenses, and applicable terms.
+
+## Learning Roadmap
+
+Git Foundations is continuously expanding with new practical learning
+materials covering advanced Git operations, GitHub collaboration,
+repository governance, automation, and security.
+
+Explore our [Learning Roadmap](ROADMAP.md) to see what is planned
+for future learning content.
